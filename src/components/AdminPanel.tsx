@@ -246,7 +246,8 @@ const AdminPanel: React.FC = () => {
                   popular: false, 
                   new: false, 
                   available: true, 
-                  orderIndex: items.length 
+                  orderIndex: items.length,
+                  sectionId: ''
                 })}
                 className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-2"
               >
