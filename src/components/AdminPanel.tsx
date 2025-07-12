@@ -20,12 +20,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     addSection,
     updateSection,
     deleteSection,
-    addItem,
-    updateItem,
-    deleteItem,
-    addOffer,
-    updateOffer,
-    deleteOffer
+    addItem: addMenuItem,
+    updateItem: updateMenuItem,
+    deleteItem: deleteMenuItem,
+    addOffer: addSpecialOffer,
+    updateOffer: updateSpecialOffer,
+    deleteOffer: deleteSpecialOffer
   } = useSupabaseAdmin();
 
   const [activeTab, setActiveTab] = useState<'sections' | 'items' | 'offers'>('sections');
@@ -108,7 +108,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     
     try {
       console.log('Adding item with sizes:', { newItem, itemSizes });
-      await addItem(newItem as Omit<MenuItem, 'id' | 'created_at' | 'updated_at'>, itemSizes);
+      await addMenuItem(newItem as Omit<MenuItem, 'id' | 'created_at' | 'updated_at'>, itemSizes);
       setNewItem({
         name: '',
         description: '',
@@ -133,7 +133,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     
     try {
       console.log('Updating item with sizes:', { editingItem, itemSizes });
-      await updateItem(editingItem.id, editingItem, itemSizes);
+      await updateMenuItem(editingItem.id, editingItem, itemSizes);
       setEditingItem(null);
       setItemSizes([]);
     } catch (error) {
@@ -166,7 +166,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     if (!editingOffer) return;
     
     try {
-      await updateOffer(editingOffer.id, editingOffer);
+      await updateSpecialOffer(editingOffer.id, editingOffer);
       setEditingOffer(null);
     } catch (error) {
       console.error('Error updating offer:', error);

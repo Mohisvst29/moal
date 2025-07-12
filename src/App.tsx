@@ -332,14 +332,10 @@ function App() {
       </div>
 
       {/* Admin Panel */}
-      {isAdminLoggedIn && (
-        <div className="relative z-50">
-          <AdminPanel
-            isOpen={isAdminOpen}
-            onClose={() => setIsAdminOpen(false)}
-          />
-        </div>
-      )}
+      <AdminPanel
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+      />
 
       {/* Login Modal for Admin */}
       <LoginModal
