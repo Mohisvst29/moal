@@ -45,6 +45,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     order_index: 0
   });
 
+  // Image upload states
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string>('');
+
   const [newItem, setNewItem] = useState<Partial<MenuItem>>({
     name: '',
     description: '',
@@ -187,6 +191,91 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     setItemSizes(itemSizes.filter((_, i) => i !== index));
   };
 
+  // Handle image upload
+  const handleImageUpload = async (file: File, type: 'section' | 'item' | 'offer') => {
+    if (!file) return;
+    
+    setUploadingImage(true);
+    try {
+      const base64Image = await convertImageToBase64(file);
+      setImagePreview(base64Image);
+      
+      if (type === 'section') {
+        if (editingSection) {
+          setEditingSection({...editingSection, image: base64Image});
+        } else {
+          setNewSection({...newSection, image: base64Image});
+        }
+      } else if (type === 'item') {
+        if (editingItem) {
+          setEditingItem({...editingItem, image: base64Image});
+        } else {
+          setNewItem({...newItem, image: base64Image});
+        }
+      } else if (type === 'offer') {
+        if (editingOffer) {
+          setEditingOffer({...editingOffer, image: base64Image});
+        } else {
+          setNewOffer({...newOffer, image: base64Image});
+        }
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('فشل في رفع الصورة');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  // Convert image to base64
+  const convertImageToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Image upload component
+  const ImageUploadComponent = ({ 
+    currentImage, 
+    onImageUpload, 
+    type 
+  }: { 
+    currentImage?: string; 
+    onImageUpload: (file: File) => void; 
+    type: 'section' | 'item' | 'offer';
+  }) => (
+    <div className="space-y-2" dir="rtl">
+      <label className="block text-sm font-medium text-gray-700">الصورة</label>
+      <div className="flex items-center gap-4">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) onImageUpload(file);
+          }}
+          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          disabled={uploadingImage}
+        />
+        {uploadingImage && (
+          <div className="text-blue-500 text-sm">جاري الرفع...</div>
+        )}
+      </div>
+      {currentImage && (
+        <div className="mt-2">
+          <img 
+            src={currentImage} 
+            alt="معاينة الصورة" 
+            className="w-20 h-20 object-cover rounded-lg border"
+          />
+        </div>
+      )}
+    </div>
+  );
+
   if (!isOpen) return null;
 
   return (
@@ -286,6 +375,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                         onChange={(e) => setNewSection({...newSection, icon: e.target.value})}
                         className="w-full p-3 border border-gray-300 rounded-lg"
                         placeholder="☕"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <ImageUploadComponent
+                        currentImage={newSection.image}
+                        onImageUpload={(file) => handleImageUpload(file, 'section')}
+                        type="section"
                       />
                     </div>
                   </div>
