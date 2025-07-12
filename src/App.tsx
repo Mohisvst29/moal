@@ -6,7 +6,7 @@ import CategoryButtons from './components/CategoryButtons';
 import MenuSection from './components/MenuSection';
 import Cart from './components/Cart';
 import AdminPanel from './components/AdminPanel';
-import LoginPage from './components/LoginPage';
+import LoginModal from './components/LoginModal';
 import VideoBackground from './components/VideoBackground';
 import { useSupabaseMenu } from './hooks/useSupabaseMenu';
 import { useCart } from './hooks/useCart';
@@ -15,7 +15,8 @@ import LoadingSpinner from './components/LoadingSpinner';
 function App() {
   const [activeSection, setActiveSection] = useState<string>('home');
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   
   const { 
@@ -77,9 +78,20 @@ function App() {
   }, [menuSections, specialOffers]);
   const currentSection = allSections.find(section => section.id === activeSection);
 
-  // إذا لم يتم تسجيل الدخول، اعرض صفحة تسجيل الدخول
-  if (!isLoggedIn) {
-    return <LoginPage onLogin={() => setIsLoggedIn(true)} />;
+  // دالة فتح لوحة التحكم
+  const handleAdminClick = () => {
+    if (isAdminLoggedIn) {
+      setIsAdminOpen(true);
+    } else {
+      setShowLoginModal(true);
+    }
+  };
+
+  // دالة تسجيل الدخول للأدمن
+  const handleAdminLogin = () => {
+    setIsAdminLoggedIn(true);
+    setShowLoginModal(false);
+    setIsAdminOpen(true);
   }
 
   // إضافة console.log لتتبع البيانات
@@ -204,7 +216,7 @@ function App() {
         
         {/* زر لوحة التحكم */}
         <button
-          onClick={() => setIsAdminOpen(true)}
+          onClick={handleAdminClick}
           className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
           title="لوحة التحكم"
         >
@@ -322,10 +334,17 @@ function App() {
       {/* Admin Panel */}
       <div className="relative z-50">
         <AdminPanel
-          isOpen={isAdminOpen}
+          isOpen={isAdminOpen && isAdminLoggedIn}
           onClose={() => setIsAdminOpen(false)}
         />
       </div>
+
+      {/* Login Modal for Admin */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLogin={handleAdminLogin}
+      />
     </div>
   );
 }
