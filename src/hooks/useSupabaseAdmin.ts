@@ -200,6 +200,7 @@ export const useSupabaseAdmin = () => {
     
     try {
       console.log('➕ Adding new menu item:', item);
+      console.log('Item sizes to add:', item.sizes);
       
       // التحقق من صحة الصورة
       if (item.image && !validateImageUrl(item.image)) {
@@ -242,14 +243,17 @@ export const useSupabaseAdmin = () => {
       }
 
       const newItem = data[0];
+      console.log('New item created with ID:', newItem.id);
 
       // إضافة الأحجام إذا كانت موجودة
       if (item.sizes && item.sizes.length > 0) {
+        console.log('Adding sizes for item:', newItem.id);
         const sizesData = item.sizes.map(size => ({
           item_id: newItem.id,
           size: size.size,
           price: size.price
         }));
+        console.log('Sizes data to insert:', sizesData);
 
         const { error: sizesError } = await supabase
           .from('menu_item_sizes')
@@ -259,6 +263,7 @@ export const useSupabaseAdmin = () => {
           console.error('❌ Error adding sizes:', sizesError);
           throw new Error(`فشل في إضافة الأحجام: ${sizesError.message}`);
         }
+        console.log('✅ Sizes added successfully');
       }
 
       console.log('✅ Menu item added successfully:', newItem);
@@ -280,6 +285,7 @@ export const useSupabaseAdmin = () => {
     
     try {
       console.log('✏️ Updating menu item:', id, updates);
+      console.log('Sizes to update:', updates.sizes);
       
       // التحقق من صحة الصورة
       if (updates.image && !validateImageUrl(updates.image)) {
@@ -311,11 +317,18 @@ export const useSupabaseAdmin = () => {
 
       // تحديث الأحجام
       if (updates.sizes !== undefined) {
+        console.log('Updating sizes for item:', id);
         // حذف الأحجام القديمة
-        await supabase
+        const { error: deleteError } = await supabase
           .from('menu_item_sizes')
           .delete()
           .eq('item_id', id);
+
+        if (deleteError) {
+          console.error('❌ Error deleting old sizes:', deleteError);
+          throw deleteError;
+        }
+        console.log('✅ Old sizes deleted');
 
         // إضافة الأحجام الجديدة
         if (updates.sizes && updates.sizes.length > 0) {
@@ -324,6 +337,7 @@ export const useSupabaseAdmin = () => {
             size: size.size,
             price: size.price
           }));
+          console.log('New sizes data to insert:', sizesData);
 
           const { error: sizesError } = await supabase
             .from('menu_item_sizes')
@@ -333,6 +347,7 @@ export const useSupabaseAdmin = () => {
             console.error('❌ Error updating sizes:', sizesError);
             throw sizesError;
           }
+          console.log('✅ New sizes added successfully');
         }
       }
 

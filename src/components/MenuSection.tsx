@@ -50,8 +50,10 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, items, icon, onAddToCa
       const id = item.id.toString();
       const selectedSize = selectedSizes[id] || item.sizes[0].size;
       const selectedPrice = item.sizes.find(s => s.size === selectedSize)?.price || item.price;
+      console.log('Adding item with size:', selectedSize, 'price:', selectedPrice);
       onAddToCart(item, selectedSize, selectedPrice);
     } else {
+      console.log('Adding item without sizes:', item.name);
       onAddToCart(item);
     }
   };

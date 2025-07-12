@@ -121,13 +121,19 @@ export const useSupabaseMenu = () => {
         .from('menu_items')
         .select(`
           *,
-          sizes:menu_item_sizes(*)
+          sizes:menu_item_sizes(
+            id,
+            size,
+            price
+          )
         `)
+        .eq('available', true)
         .order('order_index');
 
       if (error) throw error;
       
       console.log(`✅ Menu items fetched: ${data?.length || 0} items`);
+      console.log('Items with sizes:', data?.filter(item => item.sizes && item.sizes.length > 0).length);
       setMenuItems(data || []);
       return data || [];
     } catch (err) {

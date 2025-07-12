@@ -50,6 +50,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
   
   useEffect(() => {
     if (editingItem && editingItem.sizes) {
+      console.log('Loading sizes for editing:', editingItem.sizes);
       setItemSizes(editingItem.sizes);
     } else if (!editingItem) {
       setItemSizes([]);
@@ -97,7 +98,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     if (!editingItem || !editingItem.name || !editingItem.section_id) return;
     
     try {
+      console.log('Saving item with sizes:', itemSizes);
       const itemWithSizes = { ...editingItem, sizes: itemSizes };
+      console.log('Complete item data:', itemWithSizes);
       
       if (editingItem.id) {
         await updateItem(editingItem.id.toString(), itemWithSizes);
@@ -107,8 +110,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
       setEditingItem(null);
       setItemSizes([]);
       setImagePreview('');
+      console.log('✅ Item saved successfully');
     } catch (err) {
       console.error('Error saving item:', err);
+      alert('حدث خطأ في حفظ الصنف: ' + (err as Error).message);
     }
   };
 
