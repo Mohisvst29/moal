@@ -211,7 +211,7 @@ export const useSupabaseAdmin = () => {
         throw new Error('يجب إدخال اسم الصنف');
       }
       
-      if (!item.section_id) {
+      if (!item.section_id && !item.sectionId) {
         throw new Error('يجب اختيار القسم');
       }
       
@@ -222,7 +222,7 @@ export const useSupabaseAdmin = () => {
       const { data, error } = await supabase
         .from('menu_items')
         .insert([{
-          section_id: item.section_id,
+          section_id: item.section_id || item.sectionId,
           name: item.name,
           description: item.description || '',
           price: item.price,
