@@ -6,7 +6,7 @@ export interface MenuItem {
   price: number;
   calories?: number;
   image?: string;
-  sizes?: { size: string; price: number }[];
+  sizes?: Array<{ size: string; price: number }>;
   popular?: boolean;
   new?: boolean;
   available?: boolean;

@@ -203,7 +203,8 @@ export const useSupabaseAdmin = () => {
       
       // التحقق من صحة الصورة
       if (item.image && !validateImageUrl(item.image)) {
-        throw new Error('رابط الصورة غير صحيح');
+        console.warn('Invalid image URL, proceeding without image');
+        item.image = '';
       }
 
       // التحقق من البيانات المطلوبة
@@ -211,7 +212,7 @@ export const useSupabaseAdmin = () => {
         throw new Error('يجب إدخال اسم الصنف');
       }
       
-      if (!item.section_id && !item.sectionId) {
+      if (!item.section_id) {
         throw new Error('يجب اختيار القسم');
       }
       
@@ -222,7 +223,7 @@ export const useSupabaseAdmin = () => {
       const { data, error } = await supabase
         .from('menu_items')
         .insert([{
-          section_id: item.section_id || item.sectionId,
+          section_id: item.section_id,
           name: item.name,
           description: item.description || '',
           price: item.price,
@@ -282,7 +283,8 @@ export const useSupabaseAdmin = () => {
       
       // التحقق من صحة الصورة
       if (updates.image && !validateImageUrl(updates.image)) {
-        throw new Error('رابط الصورة غير صحيح');
+        console.warn('Invalid image URL, proceeding without image');
+        updates.image = '';
       }
 
       const { data, error } = await supabase
