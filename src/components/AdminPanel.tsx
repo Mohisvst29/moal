@@ -354,7 +354,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
         <div className="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white">
           <h1 className="text-3xl font-bold text-gray-900" dir="rtl">لوحة التحكم</h1>
           <button
-            onClick={() => deleteItem(item.id.toString())}
+            onClick={onClose}
             className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
           >
             ×
@@ -877,7 +877,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => deleteMenuItem(item.id.toString())}
+                            onClick={() => deleteItem(item.id.toString())}
                             className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -1104,7 +1104,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => deleteSpecialOffer(offer.id)}
+                            onClick={() => deleteOffer(offer.id)}
                             className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                             title="حذف العرض"
                           >
