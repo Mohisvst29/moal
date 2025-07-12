@@ -68,7 +68,7 @@ const AdminPanel: React.FC = () => {
 
   useEffect(() => {
     refreshData();
-  }, []);
+      fetchData();
 
   // Filter items based on selected section
   const filteredItems = selectedSectionFilter === 'all' 
