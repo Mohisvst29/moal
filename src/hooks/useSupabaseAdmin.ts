@@ -228,7 +228,7 @@ export const useSupabaseAdmin = () => {
       }
       
       if (!item.section_id) {
-        throw new Error('يجب اختيار القسم');
+        throw new Error('يجب اختيار القسم أولاً');
       }
       
       if (!item.price || item.price <= 0) {

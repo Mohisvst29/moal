@@ -587,13 +587,32 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">اسم الصنف</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">القسم *</label>
+                      <select
+                        value={editingItem.section_id || ''}
+                        onChange={(e) => setEditingItem({ ...editingItem, section_id: e.target.value })}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                        disabled={loading}
+                        required
+                      >
+                        <option value="">اختر القسم</option>
+                        {sections.map((section) => (
+                          <option key={section.id} value={section.id}>
+                            {section.icon} {section.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">اسم الصنف *</label>
                       <input
                         type="text"
                         value={editingItem.name || ''}
                         onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
                         disabled={loading}
+                        required
                       />
                     </div>
                     
@@ -605,11 +624,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
                         rows={3}
                         disabled={loading}
+                        placeholder="وصف مختصر للصنف (اختياري)"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">السعر الأساسي (ر.س)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">السعر الأساسي (ر.س) *</label>
                       <input
                         type="number"
                         value={editingItem.price || 0}
@@ -618,6 +638,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                         disabled={loading}
                         min="0"
                         step="0.01"
+                        required
+                        placeholder="0.00"
                       />
                     </div>
                     
@@ -630,24 +652,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
                         disabled={loading}
                         min="0"
+                        placeholder="0 (اختياري)"
                       />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">القسم</label>
-                      <select
-                        value={editingItem.section_id || ''}
-                        onChange={(e) => setEditingItem({ ...editingItem, section_id: e.target.value })}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                        disabled={loading}
-                      >
-                        <option value="">اختر القسم</option>
-                        {sections.map((section) => (
-                          <option key={section.id} value={section.id}>
-                            {section.title}
-                          </option>
-                        ))}
-                      </select>
                     </div>
                   </div>
 
@@ -663,7 +669,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                           className="mr-2"
                           disabled={loading}
                         />
-                        شائع
+                        الأكثر طلباً
                       </label>
                       <label className="flex items-center">
                         <input
