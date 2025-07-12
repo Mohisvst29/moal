@@ -688,10 +688,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                         <div key={index} className="flex gap-2 mb-2">
                           <input
                             type="text"
-                            placeholder="الحجم (مثل: صغير)"
+                            placeholder="اسم الحجم (مثل: كاسة، براد صغير)"
                             value={size.size}
                             onChange={(e) => updateSize(index, 'size', e.target.value)}
-                            className="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-amber-500"
+                            className="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-amber-500 text-right"
+                            dir="rtl"
                             disabled={loading}
                           />
                           <input
@@ -714,6 +715,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                           </button>
                         </div>
                       ))}
+                      
+                      {/* أمثلة للأحجام */}
+                      <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600" dir="rtl">
+                        <p className="font-medium mb-1">أمثلة للأحجام:</p>
+                        <p>• للشاي: كاسة، براد صغير، براد وسط، براد كبير</p>
+                        <p>• للبيتزا: صغير، وسط، كبير، عائلي</p>
+                        <p>• للقهوة: صغير، وسط، كبير</p>
+                      </div>
                     </div>
                   </div>
                 </div>

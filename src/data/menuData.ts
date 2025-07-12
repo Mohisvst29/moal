@@ -50,10 +50,10 @@ export const menuSections: MenuSection[] = [
         description: 'شاي أخضر طبيعي مفيد للصحة',
         image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg?auto=compress&cs=tinysrgb&w=400',
         sizes: [
-          { size: 'كاسة', price: 8 },
-          { size: 'براد صغير', price: 14 },
-          { size: 'براد وسط', price: 18 },
-          { size: 'براد كبير', price: 25 }
+          { size: 'كاسة واحدة', price: 8 },
+          { size: 'براد صغير (2-3 أكواب)', price: 14 },
+          { size: 'براد وسط (4-5 أكواب)', price: 18 },
+          { size: 'براد كبير (6-8 أكواب)', price: 25 }
         ]
       },
       { 
@@ -65,10 +65,10 @@ export const menuSections: MenuSection[] = [
         description: 'شاي مغربي تقليدي بالنعناع والسكر',
         image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg?auto=compress&cs=tinysrgb&w=400',
         sizes: [
-          { size: 'كاسة', price: 8 },
-          { size: 'براد صغير', price: 14 },
-          { size: 'براد وسط', price: 18 },
-          { size: 'براد كبير', price: 25 }
+          { size: 'كاسة واحدة', price: 8 },
+          { size: 'براد صغير (2-3 أكواب)', price: 14 },
+          { size: 'براد وسط (4-5 أكواب)', price: 18 },
+          { size: 'براد كبير (6-8 أكواب)', price: 25 }
         ]
       },
       { 
@@ -79,10 +79,10 @@ export const menuSections: MenuSection[] = [
         description: 'شاي أحمر كلاسيكي',
         image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg?auto=compress&cs=tinysrgb&w=400',
         sizes: [
-          { size: 'كاسة', price: 8 },
-          { size: 'براد صغير', price: 14 },
-          { size: 'براد وسط', price: 18 },
-          { size: 'براد كبير', price: 25 }
+          { size: 'كاسة واحدة', price: 8 },
+          { size: 'براد صغير (2-3 أكواب)', price: 14 },
+          { size: 'براد وسط (4-5 أكواب)', price: 18 },
+          { size: 'براد كبير (6-8 أكواب)', price: 25 }
         ]
       }
     ]
@@ -127,9 +127,9 @@ export const menuSections: MenuSection[] = [
         description: 'بيتزا بالخضار الطازجة والجبن',
         image: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400',
         sizes: [
-          { size: 'صغير', price: 12 },
-          { size: 'وسط', price: 18 },
-          { size: 'كبير', price: 24 }
+          { size: 'صغير (6 قطع)', price: 12 },
+          { size: 'وسط (8 قطع)', price: 18 },
+          { size: 'كبير (12 قطعة)', price: 24 }
         ]
       },
       { 
@@ -141,9 +141,9 @@ export const menuSections: MenuSection[] = [
         description: 'بيتزا بقطع الدجاج المشوي والخضار',
         image: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400',
         sizes: [
-          { size: 'صغير', price: 14 },
-          { size: 'وسط', price: 20 },
-          { size: 'كبير', price: 27 }
+          { size: 'صغير (6 قطع)', price: 14 },
+          { size: 'وسط (8 قطع)', price: 20 },
+          { size: 'كبير (12 قطعة)', price: 27 }
         ]
       },
       { 
@@ -154,9 +154,9 @@ export const menuSections: MenuSection[] = [
         description: 'بيتزا بخليط من اللحوم والخضار',
         image: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400',
         sizes: [
-          { size: 'صغير', price: 15 },
-          { size: 'وسط', price: 20 },
-          { size: 'كبير', price: 27 }
+          { size: 'صغير (6 قطع)', price: 15 },
+          { size: 'وسط (8 قطع)', price: 20 },
+          { size: 'كبير (12 قطعة)', price: 27 }
         ]
       }
     ]
