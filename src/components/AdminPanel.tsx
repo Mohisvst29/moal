@@ -129,17 +129,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
   };
 
   const addSize = () => {
-    setItemSizes([...itemSizes, { size: '', price: 0 }]);
+    const newSizes = [...itemSizes, { size: '', price: 0 }];
+    setItemSizes(newSizes);
+    console.log('Added new size, total sizes:', newSizes.length);
   };
 
   const updateSize = (index: number, field: 'size' | 'price', value: string | number) => {
+    console.log('Updating size at index:', index, 'field:', field, 'value:', value);
     const newSizes = [...itemSizes];
-    newSizes[index] = { ...newSizes[index], [field]: value };
+    if (newSizes[index]) {
+      newSizes[index] = { ...newSizes[index], [field]: value };
+    }
     setItemSizes(newSizes);
+    console.log('Updated sizes:', newSizes);
   };
 
   const removeSize = (index: number) => {
-    setItemSizes(itemSizes.filter((_, i) => i !== index));
+    console.log('Removing size at index:', index, 'from', itemSizes.length, 'sizes');
+    const newSizes = itemSizes.filter((_, i) => i !== index);
+    setItemSizes(newSizes);
+    console.log('Remaining sizes:', newSizes.length);
   };
 
   const ImageUploadSection = ({ type, currentImage }: { type: 'section' | 'item' | 'offer', currentImage?: string }) => (
@@ -562,12 +571,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
           {/* Edit Item Modal */}
           {editingItem && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="bg-white rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
                 <h3 className="text-xl font-bold mb-4">
                   {editingItem.id ? 'تعديل الصنف' : 'إضافة صنف جديد'}
                 </h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">اسم الصنف</label>
@@ -671,57 +680,103 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* إدارة الأحجام */}
-                    <div>
+                    <div className="lg:col-span-2">
                       <div className="flex justify-between items-center mb-2">
                         <label className="block text-sm font-medium text-gray-700">الأحجام والأسعار</label>
                         <button
                           type="button"
                           onClick={addSize}
-                          className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+                          className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors flex items-center gap-2"
                           disabled={loading}
                         >
+                          <Plus className="w-4 h-4" />
                           إضافة حجم
                         </button>
                       </div>
                       
-                      {itemSizes.map((size, index) => (
-                        <div key={index} className="flex gap-2 mb-2">
-                          <input
-                            type="text"
-                            placeholder="اسم الحجم (مثل: كاسة، براد صغير)"
-                            value={size.size}
-                            onChange={(e) => updateSize(index, 'size', e.target.value)}
-                            className="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-amber-500 text-right"
-                            dir="rtl"
-                            disabled={loading}
-                          />
-                          <input
-                            type="number"
-                            placeholder="السعر"
-                            value={size.price}
-                            onChange={(e) => updateSize(index, 'price', Number(e.target.value))}
-                            className="w-24 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-amber-500"
-                            min="0"
-                            step="0.01"
-                            disabled={loading}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeSize(index)}
-                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                            disabled={loading}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                      <div className="space-y-3">
+                        {itemSizes.map((size, index) => (
+                          <div key={`size-${index}`} className="bg-gray-50 p-3 rounded-lg border">
+                            <div className="flex gap-3 items-center">
+                              <div className="flex-1">
+                                <label className="block text-xs text-gray-600 mb-1" dir="rtl">اسم الحجم</label>
+                                <input
+                                  type="text"
+                                  placeholder="مثل: كاسة، براد صغير، صغير (6 قطع)"
+                                  value={size.size || ''}
+                                  onChange={(e) => updateSize(index, 'size', e.target.value)}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-right"
+                                  dir="rtl"
+                                  disabled={loading}
+                                />
+                              </div>
+                              <div className="w-32">
+                                <label className="block text-xs text-gray-600 mb-1" dir="rtl">السعر (ر.س)</label>
+                                <input
+                                  type="number"
+                                  placeholder="0.00"
+                                  value={size.price || ''}
+                                  onChange={(e) => updateSize(index, 'price', Number(e.target.value))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                                  min="0"
+                                  step="0.01"
+                                  disabled={loading}
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <label className="text-xs text-gray-600 opacity-0">حذف</label>
+                                <button
+                                  type="button"
+                                  onClick={() => removeSize(index)}
+                                  className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center"
+                                  disabled={loading}
+                                  title="حذف الحجم"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                         </div>
-                      ))}
+                      
+                      {itemSizes.length === 0 && (
+                        <div className="text-center py-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                          <p className="text-gray-500 text-sm" dir="rtl">
+                            لا توجد أحجام مضافة. اضغط "إضافة حجم" لإضافة حجم جديد
+                          </p>
+                          <p className="text-gray-400 text-xs mt-1" dir="rtl">
+                            إذا لم تضف أحجام، سيتم استخدام السعر الأساسي فقط
+                          </p>
+                        </div>
+                      )}
                       
                       {/* أمثلة للأحجام */}
-                      <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600" dir="rtl">
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg text-xs text-blue-700 border border-blue-200" dir="rtl">
                         <p className="font-medium mb-1">أمثلة للأحجام:</p>
-                        <p>• للشاي: كاسة، براد صغير، براد وسط، براد كبير</p>
-                        <p>• للبيتزا: صغير، وسط، كبير، عائلي</p>
-                        <p>• للقهوة: صغير، وسط، كبير</p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+                          <div>
+                            <p className="font-medium text-blue-800">للشاي:</p>
+                            <p>• كاسة واحدة</p>
+                            <p>• براد صغير (2-3 أكواب)</p>
+                            <p>• براد وسط (4-5 أكواب)</p>
+                            <p>• براد كبير (6-8 أكواب)</p>
+                          </div>
+                          <div>
+                            <p className="font-medium text-blue-800">للبيتزا:</p>
+                            <p>• صغير (6 قطع)</p>
+                            <p>• وسط (8 قطع)</p>
+                            <p>• كبير (12 قطعة)</p>
+                            <p>• عائلي (16 قطعة)</p>
+                          </div>
+                          <div>
+                            <p className="font-medium text-blue-800">للقهوة:</p>
+                            <p>• صغير</p>
+                            <p>• وسط</p>
+                            <p>• كبير</p>
+                            <p>• إكسترا لارج</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
