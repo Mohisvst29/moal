@@ -35,6 +35,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
   } = useSupabaseAdmin();
 
   const [activeTab, setActiveTab] = useState<'sections' | 'items' | 'offers'>('sections');
+  const [selectedSectionFilter, setSelectedSectionFilter] = useState<string>('all');
   const [editingSection, setEditingSection] = useState<Partial<MenuSection> | null>(null);
   const [editingItem, setEditingItem] = useState<Partial<MenuItem> | null>(null);
   const [editingOffer, setEditingOffer] = useState<Partial<SpecialOffer> | null>(null);
@@ -60,6 +61,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  // فلترة الأصناف حسب القسم المختار
+  const filteredItems = selectedSectionFilter === 'all' 
+    ? items 
+    : items.filter(item => item.section_id === selectedSectionFilter);
+
+  // الحصول على اسم القسم
+  const getSectionName = (sectionId: string) => {
+    const section = sections.find(s => s.id === sectionId);
+    return section ? `${section.icon} ${section.title}` : 'قسم غير معروف';
+  };
   const handleImageUpload = async (file: File, type: 'section' | 'item' | 'offer') => {
     try {
       setImageUploadError('');
@@ -369,11 +380,79 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {items.map((item) => (
+              {/* فلتر الأقسام */}
+              <div className="mb-6 bg-gray-50 p-4 rounded-lg">
+                <label className="block text-sm font-medium text-gray-700 mb-3">فلترة الأصناف حسب القسم:</label>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedSectionFilter('all')}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      selectedSectionFilter === 'all'
+                        ? 'bg-amber-500 text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                    }`}
+                  >
+                    جميع الأصناف ({items.length})
+                  </button>
+                  {sections.map((section) => (
+                    <button
+                      key={section.id}
+                      onClick={() => setSelectedSectionFilter(section.id.toString())}
+                          section_id: selectedSectionFilter !== 'all' ? selectedSectionFilter : ''
+                        selectedSectionFilter === section.id.toString()
+                          ? 'bg-amber-500 text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                      }`}
+                    >
+                      {section.icon} {section.title} ({items.filter(item => item.section_id === section.id).length})
+                    </button>
+                  ))}
+                </div>
+                {selectedSectionFilter !== 'all' && (
+                  <div className="mt-3 text-sm text-gray-600">
+                    عرض أصناف قسم: <strong>{getSectionName(selectedSectionFilter)}</strong>
+                  </div>
+                )}
+              </div>
+              {/* عرض الأصناف المفلترة */}
+              {filteredItems.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <p className="text-gray-500 text-lg" dir="rtl">
+                    {selectedSectionFilter === 'all' 
+                      ? 'لا توجد أصناف مضافة بعد' 
+                      : `لا توجد أصناف في قسم ${getSectionName(selectedSectionFilter)}`
+                    }
+                  </p>
+                  <button
+                    onClick={() => {
+                      setEditingItem({ 
+                        name: '', 
+                        description: '', 
+                        price: 0, 
+                        calories: 0,
+                        image: '', 
+                        popular: false, 
+                        new: false, 
+                        available: true, 
+                        order_index: items.length,
+                        section_id: selectedSectionFilter !== 'all' ? selectedSectionFilter : ''
+                      });
+                      setItemSizes([]);
+                    }}
+                    className="mt-4 bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition-colors"
+                  >
+                    إضافة صنف جديد
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredItems.map((item) => (
                   <div key={item.id} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold">{item.name}</h3>
+                      <div>
+                        <h3 className="font-semibold">{item.name}</h3>
+                        <p className="text-xs text-gray-500">{getSectionName(item.section_id)}</p>
+                      </div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => {
@@ -433,8 +512,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                       )}
                     </div>
                   </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
