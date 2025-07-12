@@ -4,13 +4,19 @@ import { MenuSection, MenuItem, SpecialOffer } from '../types/menu';
 import { Trash2, Edit, Plus, Save, X, Eye, EyeOff } from 'lucide-react';
 import LoadingSpinner from './LoadingSpinner';
 
-const AdminPanel: React.FC = () => {
+interface AdminPanelProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
   const {
     sections,
     items,
     offers,
     loading,
     error,
+    fetchData,
     addSection,
     updateSection,
     deleteSection,
@@ -19,8 +25,7 @@ const AdminPanel: React.FC = () => {
     deleteItem,
     addOffer,
     updateOffer,
-    deleteOffer,
-    fetchData
+    deleteOffer
   } = useSupabaseAdmin();
 
   const [activeTab, setActiveTab] = useState<'sections' | 'items' | 'offers'>('sections');
@@ -184,8 +189,61 @@ const AdminPanel: React.FC = () => {
 
   if (loading) return <LoadingSpinner />;
 
+  if (!isOpen) return null;
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-8 overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-7xl mx-4 mb-8">
+        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <h1 className="text-3xl font-bold text-gray-900">لوحة التحكم</h1>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+          >
+            ×
+          </button>
+        </div>
+        
+        <div className="p-6">
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+              {error}
+            </div>
+          )}
+
+          {/* Tabs */}
+          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-6">
+            <button
+              onClick={() => setActiveTab('sections')}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+                activeTab === 'sections'
+                  ? 'bg-white text-amber-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              الأقسام ({sections.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('items')}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+                activeTab === 'items'
+                  ? 'bg-white text-amber-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              الأصناف ({items.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('offers')}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+                activeTab === 'offers'
+                  ? 'bg-white text-amber-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              العروض الخاصة ({offers.length})
+            </button>
+          </div>
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">لوحة التحكم</h1>
         
@@ -1002,6 +1060,7 @@ const AdminPanel: React.FC = () => {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

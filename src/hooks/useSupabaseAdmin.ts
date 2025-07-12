@@ -208,13 +208,13 @@ export const useSupabaseAdmin = () => {
   };
 
   // إضافة عنصر جديد
-  const addMenuItem = async (item: Omit<MenuItem, 'id'>) => {
+  const addMenuItem = async (item: Omit<MenuItem, 'id'>, sizes?: Array<{ size: string; price: number }>) => {
     setLoading(true);
     setError(null);
     
     try {
       console.log('➕ Adding new menu item:', item);
-      console.log('🔍 Item sizes to add:', JSON.stringify(item.sizes, null, 2));
+      console.log('🔍 Item sizes to add:', JSON.stringify(sizes, null, 2));
       
       // التحقق من صحة الصورة
       if (item.image && !validateImageUrl(item.image)) {
@@ -260,9 +260,9 @@ export const useSupabaseAdmin = () => {
       console.log('✅ New item created with ID:', newItem.id);
 
       // إضافة الأحجام إذا كانت موجودة
-      if (item.sizes && item.sizes.length > 0) {
+      if (sizes && sizes.length > 0) {
         console.log('📏 Adding sizes for item:', newItem.id);
-        const sizesData = item.sizes.map(size => ({
+        const sizesData = sizes.map(size => ({
           item_id: newItem.id,
           size: size.size,
           price: size.price
@@ -305,13 +305,13 @@ export const useSupabaseAdmin = () => {
   };
 
   // تحديث عنصر
-  const updateMenuItem = async (id: string, updates: Partial<MenuItem>) => {
+  const updateMenuItem = async (id: string, updates: Partial<MenuItem>, sizes?: Array<{ size: string; price: number }>) => {
     setLoading(true);
     setError(null);
     
     try {
       console.log('✏️ Updating menu item:', id, updates);
-      console.log('📏 Sizes to update:', JSON.stringify(updates.sizes, null, 2));
+      console.log('📏 Sizes to update:', JSON.stringify(sizes, null, 2));
       
       // التحقق من صحة الصورة
       if (updates.image && !validateImageUrl(updates.image)) {
@@ -342,7 +342,7 @@ export const useSupabaseAdmin = () => {
       }
 
       // تحديث الأحجام
-      if (updates.sizes !== undefined) {
+      if (sizes !== undefined) {
         console.log('🔄 Updating sizes for item:', id);
         // حذف الأحجام القديمة
         const { error: deleteError } = await supabase
@@ -357,8 +357,8 @@ export const useSupabaseAdmin = () => {
         console.log('🗑️ Old sizes deleted successfully');
 
         // إضافة الأحجام الجديدة
-        if (updates.sizes && updates.sizes.length > 0) {
-          const sizesData = updates.sizes.map(size => ({
+        if (sizes && sizes.length > 0) {
+          const sizesData = sizes.map(size => ({
             item_id: id,
             size: size.size,
             price: size.price
