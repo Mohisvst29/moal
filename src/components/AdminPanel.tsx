@@ -528,35 +528,166 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredItems.map((item) => (
                   <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2" dir="rtl">
-                      <h3 className="font-bold">{item.name}</h3>
-                      <span className="text-amber-600 font-bold">{item.price} ر.س</span>
-                    </div>
-                    {item.description && (
-                      <p className="text-gray-600 text-sm mb-2" dir="rtl">{item.description}</p>
-                    )}
-                    {item.sizes && item.sizes.length > 0 && (
-                      <div className="text-xs text-gray-500 mb-2" dir="rtl">
-                        أحجام: {item.sizes.length}
+                    {editingItem?.id === item.id ? (
+                      <div>
+                        <div className="grid grid-cols-1 gap-4">
+                          <div dir="rtl">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">اسم الصنف</label>
+                            <input
+                              type="text"
+                              value={editingItem.name || ''}
+                              onChange={(e) => setEditingItem({...editingItem, name: e.target.value})}
+                              className="w-full p-2 border border-gray-300 rounded"
+                            />
+                          </div>
+                          <div dir="rtl">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
+                            <textarea
+                              value={editingItem.description || ''}
+                              onChange={(e) => setEditingItem({...editingItem, description: e.target.value})}
+                              className="w-full p-2 border border-gray-300 rounded"
+                              rows={2}
+                            />
+                          </div>
+                          <div dir="rtl">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">السعر</label>
+                            <input
+                              type="number"
+                              value={editingItem.price || 0}
+                              onChange={(e) => setEditingItem({...editingItem, price: Number(e.target.value)})}
+                              className="w-full p-2 border border-gray-300 rounded"
+                            />
+                          </div>
+                          <div dir="rtl">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">السعرات الحرارية</label>
+                            <input
+                              type="number"
+                              value={editingItem.calories || ''}
+                              onChange={(e) => setEditingItem({...editingItem, calories: e.target.value ? Number(e.target.value) : undefined})}
+                              className="w-full p-2 border border-gray-300 rounded"
+                            />
+                          </div>
+                          
+                          {/* Sizes for editing */}
+                          <div dir="rtl">
+                            <div className="flex justify-between items-center mb-2">
+                              <label className="block text-sm font-medium text-gray-700">الأحجام</label>
+                              <button
+                                onClick={addSize}
+                                className="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600"
+                              >
+                                إضافة حجم
+                              </button>
+                            </div>
+                            {itemSizes.map((size, index) => (
+                              <div key={index} className="flex gap-2 mb-2">
+                                <input
+                                  type="text"
+                                  value={size.size}
+                                  onChange={(e) => updateSize(index, 'size', e.target.value)}
+                                  className="flex-1 p-2 border border-gray-300 rounded"
+                                  placeholder="الحجم"
+                                />
+                                <input
+                                  type="number"
+                                  value={size.price}
+                                  onChange={(e) => updateSize(index, 'price', Number(e.target.value))}
+                                  className="w-20 p-2 border border-gray-300 rounded"
+                                  placeholder="السعر"
+                                />
+                                <button
+                                  onClick={() => removeSize(index)}
+                                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="flex items-center gap-4" dir="rtl">
+                            <label className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={editingItem.popular || false}
+                                onChange={(e) => setEditingItem({...editingItem, popular: e.target.checked})}
+                              />
+                              الأكثر طلباً
+                            </label>
+                            <label className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={editingItem.new || false}
+                                onChange={(e) => setEditingItem({...editingItem, new: e.target.checked})}
+                              />
+                              جديد
+                            </label>
+                            <label className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={editingItem.available !== false}
+                                onChange={(e) => setEditingItem({...editingItem, available: e.target.checked})}
+                              />
+                              متاح
+                            </label>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <button
+                            onClick={handleUpdateItem}
+                            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-1"
+                            dir="rtl"
+                          >
+                            <Save className="w-4 h-4" />
+                            حفظ
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingItem(null);
+                              setItemSizes([]);
+                            }}
+                            className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 flex items-center gap-1"
+                            dir="rtl"
+                          >
+                            <X className="w-4 h-4" />
+                            إلغاء
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2" dir="rtl">
+                          <h3 className="font-bold">{item.name}</h3>
+                          <span className="text-amber-600 font-bold">{item.price} ر.س</span>
+                        </div>
+                        {item.description && (
+                          <p className="text-gray-600 text-sm mb-2" dir="rtl">{item.description}</p>
+                        )}
+                        {item.sizes && item.sizes.length > 0 && (
+                          <div className="text-xs text-gray-500 mb-2" dir="rtl">
+                            أحجام: {item.sizes.length}
+                          </div>
+                        )}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingItem(item);
+                              setItemSizes(item.sizes || []);
+                            }}
+                            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteMenuItem(item.id.toString())}
+                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     )}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          setEditingItem(item);
-                          setItemSizes(item.sizes || []);
-                        }}
-                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => deleteItem(item.id.toString())}
-                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
                   </div>
                 ))}
               </div>
@@ -657,29 +788,104 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {offers.map((offer) => (
                   <div key={offer.id} className="bg-white border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2" dir="rtl">
-                      <h3 className="font-bold">{offer.title}</h3>
-                    </div>
-                    <p className="text-gray-600 text-sm mb-2" dir="rtl">{offer.description}</p>
-                    <div className="flex items-center gap-2 mb-2" dir="rtl">
-                      <span className="text-gray-400 line-through">{offer.original_price} ر.س</span>
-                      <span className="text-green-600 font-bold">{offer.offer_price} ر.س</span>
-                    </div>
-                    <p className="text-xs text-gray-500 mb-2" dir="rtl">صالح حتى: {offer.valid_until}</p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setEditingOffer(offer)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => deleteOffer(offer.id)}
-                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    {editingOffer?.id === offer.id ? (
+                      <div>
+                        <div className="grid grid-cols-1 gap-4">
+                          <div dir="rtl">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">عنوان العرض</label>
+                            <input
+                              type="text"
+                              value={editingOffer.title || ''}
+                              onChange={(e) => setEditingOffer({...editingOffer, title: e.target.value})}
+                              className="w-full p-2 border border-gray-300 rounded"
+                            />
+                          </div>
+                          <div dir="rtl">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
+                            <textarea
+                              value={editingOffer.description || ''}
+                              onChange={(e) => setEditingOffer({...editingOffer, description: e.target.value})}
+                              className="w-full p-2 border border-gray-300 rounded"
+                              rows={2}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div dir="rtl">
+                              <label className="block text-sm font-medium text-gray-700 mb-2">السعر الأصلي</label>
+                              <input
+                                type="number"
+                                value={editingOffer.originalPrice || 0}
+                                onChange={(e) => setEditingOffer({...editingOffer, originalPrice: Number(e.target.value)})}
+                                className="w-full p-2 border border-gray-300 rounded"
+                              />
+                            </div>
+                            <div dir="rtl">
+                              <label className="block text-sm font-medium text-gray-700 mb-2">سعر العرض</label>
+                              <input
+                                type="number"
+                                value={editingOffer.offerPrice || 0}
+                                onChange={(e) => setEditingOffer({...editingOffer, offerPrice: Number(e.target.value)})}
+                                className="w-full p-2 border border-gray-300 rounded"
+                              />
+                            </div>
+                          </div>
+                          <div dir="rtl">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">صالح حتى</label>
+                            <input
+                              type="text"
+                              value={editingOffer.validUntil || ''}
+                              onChange={(e) => setEditingOffer({...editingOffer, validUntil: e.target.value})}
+                              className="w-full p-2 border border-gray-300 rounded"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <button
+                            onClick={handleUpdateOffer}
+                            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-1"
+                            dir="rtl"
+                          >
+                            <Save className="w-4 h-4" />
+                            حفظ
+                          </button>
+                          <button
+                            onClick={() => setEditingOffer(null)}
+                            className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 flex items-center gap-1"
+                            dir="rtl"
+                          >
+                            <X className="w-4 h-4" />
+                            إلغاء
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2" dir="rtl">
+                          <h3 className="font-bold">{offer.title}</h3>
+                        </div>
+                        <p className="text-gray-600 text-sm mb-2" dir="rtl">{offer.description}</p>
+                        <div className="flex items-center gap-2 mb-2" dir="rtl">
+                          <span className="text-gray-400 line-through">{offer.original_price} ر.س</span>
+                          <span className="text-green-600 font-bold">{offer.offer_price} ر.س</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mb-2" dir="rtl">صالح حتى: {offer.valid_until}</p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setEditingOffer(offer)}
+                            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteSpecialOffer(offer.id)}
+                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
