@@ -4,7 +4,12 @@ import { useSupabaseAdmin } from '../hooks/useSupabaseAdmin';
 import { MenuItem, MenuSection, SpecialOffer } from '../types/menu';
 import LoadingSpinner from './LoadingSpinner';
 
-const AdminPanel: React.FC = () => {
+interface AdminPanelProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
   const {
     sections,
     items,
@@ -34,6 +39,7 @@ const AdminPanel: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
+  if (!isOpen) return null;
   const handleSaveSection = async () => {
     if (!editingSection) return;
     
@@ -141,10 +147,20 @@ const AdminPanel: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6" dir="rtl">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">لوحة التحكم</h1>
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="bg-gray-50 rounded-lg w-full max-w-6xl h-[90vh] overflow-y-auto p-6" dir="rtl">
+        {/* زر الإغلاق */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">لوحة التحكم</h1>
+          <button
+            onClick={onClose}
+            className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
         
+      <div className="max-w-7xl mx-auto">
         {/* Navigation Tabs */}
         <div className="flex justify-center mb-8">
           <div className="bg-white rounded-lg p-1 shadow-md">
@@ -689,6 +705,7 @@ const AdminPanel: React.FC = () => {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

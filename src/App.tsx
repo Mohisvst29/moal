@@ -208,7 +208,7 @@ function App() {
         
         {/* زر لوحة التحكم */}
         <button
-          onClick={handleAdminClick}
+          onClick={() => setIsAdminOpen(true)}
           className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
           title="لوحة التحكم"
         >
