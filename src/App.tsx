@@ -6,7 +6,7 @@ import CategoryButtons from './components/CategoryButtons';
 import MenuSection from './components/MenuSection';
 import Cart from './components/Cart';
 import AdminPanel from './components/AdminPanel';
-import LoginModal from './components/LoginModal';
+import LoginPage from './components/LoginPage';
 import VideoBackground from './components/VideoBackground';
 import { useSupabaseMenu } from './hooks/useSupabaseMenu';
 import { useCart } from './hooks/useCart';
@@ -15,7 +15,6 @@ import LoadingSpinner from './components/LoadingSpinner';
 function App() {
   const [activeSection, setActiveSection] = useState<string>('home');
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   
@@ -78,13 +77,10 @@ function App() {
   }, [menuSections, specialOffers]);
   const currentSection = allSections.find(section => section.id === activeSection);
 
-  const handleAdminClick = () => {
-    if (isLoggedIn) {
-      setIsAdminOpen(true);
-    } else {
-      setIsLoginOpen(true);
-    }
-  };
+  // إذا لم يتم تسجيل الدخول، اعرض صفحة تسجيل الدخول
+  if (!isLoggedIn) {
+    return <LoginPage onLogin={() => setIsLoggedIn(true)} />;
+  }
 
   // إضافة console.log لتتبع البيانات
   console.log('App State:', {
@@ -328,15 +324,6 @@ function App() {
         <AdminPanel
           isOpen={isAdminOpen}
           onClose={() => setIsAdminOpen(false)}
-        />
-      </div>
-
-      {/* Login Modal */}
-      <div className="relative z-50">
-        <LoginModal
-          isOpen={isLoginOpen}
-          onClose={() => setIsLoginOpen(false)}
-          onLogin={() => setIsLoggedIn(true)}
         />
       </div>
     </div>
