@@ -37,7 +37,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     fetchData();
+    
+    // تحديث الأحجام عند تحرير عنصر موجود
+    if (editingItem && editingItem.sizes) {
+      setItemSizes(editingItem.sizes);
+    } else {
+      setItemSizes([]);
+    }
   }, [fetchData]);
+  
+  useEffect(() => {
+    if (editingItem && editingItem.sizes) {
+      setItemSizes(editingItem.sizes);
+    } else if (!editingItem) {
+      setItemSizes([]);
+    }
+  }, [editingItem]);
 
   if (!isOpen) return null;
   const handleSaveSection = async () => {
