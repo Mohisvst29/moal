@@ -354,7 +354,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
         <div className="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white">
           <h1 className="text-3xl font-bold text-gray-900" dir="rtl">لوحة التحكم</h1>
           <button
-            onClick={onClose}
+            onClick={() => deleteItem(item.id.toString())}
             className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
           >
             ×
