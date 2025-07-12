@@ -438,6 +438,33 @@ export const useSupabaseAdmin = () => {
     try {
       console.log('➕ Adding new special offer:', offer);
       
+      // التحقق من البيانات المطلوبة
+      if (!offer.title || offer.title.trim() === '') {
+        throw new Error('يجب إدخال عنوان العرض');
+      }
+      
+      if (!offer.description || offer.description.trim() === '') {
+        throw new Error('يجب إدخال وصف العرض');
+      }
+      
+      if (!offer.originalPrice || offer.originalPrice <= 0) {
+        throw new Error('يجب إدخال السعر الأصلي');
+      }
+      
+      if (!offer.offerPrice || offer.offerPrice <= 0) {
+        throw new Error('يجب إدخال سعر العرض');
+      }
+      
+      if (!offer.validUntil || offer.validUntil.trim() === '') {
+        throw new Error('يجب إدخال تاريخ انتهاء العرض');
+      }
+      
+      // التحقق من صحة الصورة
+      if (offer.image && !validateImageUrl(offer.image)) {
+        console.warn('Invalid image URL, proceeding without image');
+        offer.image = '';
+      }
+      
       const { data, error } = await supabase
         .from('special_offers')
         .insert([{
@@ -454,7 +481,7 @@ export const useSupabaseAdmin = () => {
 
       if (error) {
         console.error('❌ Error adding special offer:', error);
-        throw error;
+        throw new Error(`فشل في إضافة العرض: ${error.message}`);
       }
       
       console.log('✅ Special offer added successfully:', data);
@@ -462,7 +489,7 @@ export const useSupabaseAdmin = () => {
       return data;
     } catch (err: any) {
       console.error('❌ Add special offer failed:', err);
-      setError(`فشل في إضافة العرض: ${err.message}`);
+      setError(err.message || 'فشل في إضافة العرض');
       throw err;
     } finally {
       setLoading(false);
@@ -477,6 +504,10 @@ export const useSupabaseAdmin = () => {
     try {
       console.log('✏️ Updating special offer:', id, updates);
       
+      // التحقق من صحة الصورة
+      if (updates.image && !validateImageUrl(updates.image)) {
+        throw new Error('رابط الصورة غير صحيح');
+      }
 
       const { data, error } = await supabase
         .from('special_offers')
@@ -496,7 +527,7 @@ export const useSupabaseAdmin = () => {
 
       if (error) {
         console.error('❌ Error updating special offer:', error);
-        throw error;
+        throw new Error(`فشل في تحديث العرض: ${error.message}`);
       }
       
       console.log('✅ Special offer updated successfully:', data);
@@ -504,7 +535,7 @@ export const useSupabaseAdmin = () => {
       return data;
     } catch (err: any) {
       console.error('❌ Update special offer failed:', err);
-      setError(`فشل في تحديث العرض: ${err.message}`);
+      setError(err.message || 'فشل في تحديث العرض');
       throw err;
     } finally {
       setLoading(false);
@@ -518,6 +549,13 @@ export const useSupabaseAdmin = () => {
     
     try {
       console.log('🗑️ Deleting special offer:', id);
+      
+      // التأكيد من المستخدم
+      const confirmed = window.confirm('هل أنت متأكد من حذف هذا العرض؟');
+      if (!confirmed) {
+        setLoading(false);
+        return;
+      }
 
       const { error } = await supabase
         .from('special_offers')
@@ -526,7 +564,7 @@ export const useSupabaseAdmin = () => {
 
       if (error) {
         console.error('❌ Error deleting special offer:', error);
-        throw error;
+        throw new Error(`فشل في حذف العرض: ${error.message}`);
       }
       
       console.log('✅ Special offer deleted successfully');

@@ -153,7 +153,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
   };
 
   const handleAddOffer = async () => {
-    if (!newOffer.title || !newOffer.description) return;
+    if (!newOffer.title || !newOffer.description || !newOffer.originalPrice || !newOffer.offerPrice || !newOffer.validUntil) {
+      alert('يرجى ملء جميع الحقول المطلوبة');
+      return;
+    }
+    
+    if (newOffer.offerPrice >= newOffer.originalPrice) {
+      alert('سعر العرض يجب أن يكون أقل من السعر الأصلي');
+      return;
+    }
     
     try {
       await addOffer(newOffer as Omit<SpecialOffer, 'id'>);
@@ -168,19 +176,36 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
         active: true
       });
       setShowAddOffer(false);
+      alert('تم إضافة العرض بنجاح! ✅');
     } catch (error) {
       console.error('Error adding offer:', error);
+      alert('فشل في إضافة العرض. يرجى المحاولة مرة أخرى.');
     }
   };
 
   const handleUpdateOffer = async () => {
-    if (!editingOffer) return;
+    if (!editingOffer) {
+      alert('لا يوجد عرض للتحديث');
+      return;
+    }
+    
+    if (!editingOffer.title || !editingOffer.description || !editingOffer.originalPrice || !editingOffer.offerPrice || !editingOffer.validUntil) {
+      alert('يرجى ملء جميع الحقول المطلوبة');
+      return;
+    }
+    
+    if (editingOffer.offerPrice >= editingOffer.originalPrice) {
+      alert('سعر العرض يجب أن يكون أقل من السعر الأصلي');
+      return;
+    }
     
     try {
       await updateOffer(editingOffer.id, editingOffer);
       setEditingOffer(null);
+      alert('تم تحديث العرض بنجاح! ✅');
     } catch (error) {
       console.error('Error updating offer:', error);
+      alert('فشل في تحديث العرض. يرجى المحاولة مرة أخرى.');
     }
   };
 
@@ -894,6 +919,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                         onChange={(e) => setNewOffer({...newOffer, title: e.target.value})}
                         className="w-full p-3 border border-gray-300 rounded-lg"
                         placeholder="مثال: عرض الإفطار المميز"
+                        required
                       />
                     </div>
                     <div dir="rtl">
@@ -904,6 +930,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                         onChange={(e) => setNewOffer({...newOffer, validUntil: e.target.value})}
                         className="w-full p-3 border border-gray-300 rounded-lg"
                         placeholder="مثال: 31 ديسمبر 2024"
+                        required
                       />
                     </div>
                     <div dir="rtl">
@@ -914,6 +941,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                         onChange={(e) => setNewOffer({...newOffer, originalPrice: Number(e.target.value)})}
                         className="w-full p-3 border border-gray-300 rounded-lg"
                         placeholder="0"
+                        min="1"
+                        required
                       />
                     </div>
                     <div dir="rtl">
@@ -924,6 +953,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                         onChange={(e) => setNewOffer({...newOffer, offerPrice: Number(e.target.value)})}
                         className="w-full p-3 border border-gray-300 rounded-lg"
                         placeholder="0"
+                        min="1"
+                        required
                       />
                     </div>
                   </div>
@@ -935,6 +966,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                       className="w-full p-3 border border-gray-300 rounded-lg"
                       rows={3}
                       placeholder="وصف العرض"
+                      required
                     />
                   </div>
                   
@@ -1074,6 +1106,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                           <button
                             onClick={() => deleteSpecialOffer(offer.id)}
                             className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                            title="حذف العرض"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
