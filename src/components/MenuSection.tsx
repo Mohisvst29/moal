@@ -12,7 +12,11 @@ interface MenuSectionProps {
 const MenuSection: React.FC<MenuSectionProps> = ({ title, items, icon, onAddToCart }) => {
   const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
 
-  console.log('MenuSection received:', { title, itemsCount: items.length });
+  console.log('MenuSection received:', { 
+    title, 
+    itemsCount: items.length,
+    items: items.map(item => ({ id: item.id, name: item.name, available: item.available }))
+  });
 
   if (!items || items.length === 0) {
     return (
@@ -26,7 +30,10 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, items, icon, onAddToCa
         <div className="text-center py-12">
           <div className="bg-white/90 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-amber-200/50">
             <p className="text-gray-600 text-lg" dir="rtl">
-              لا توجد عناصر متاحة في هذا القسم حالياً
+              لا توجد عناصر متاحة في هذا القسم حالياً ({title})
+            </p>
+            <p className="text-gray-500 text-sm mt-2" dir="rtl">
+              عدد العناصر المستلمة: {items?.length || 0}
             </p>
           </div>
         </div>

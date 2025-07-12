@@ -94,7 +94,9 @@ function App() {
     allSectionsCount: allSections.length,
     specialOffersCount: specialOffers.length,
     activeSection,
-    currentSection: currentSection ? currentSection.title : 'Not found'
+    currentSection: currentSection ? currentSection.title : 'Not found',
+    menuSectionsFromHook: menuSections.length,
+    specialOffersFromHook: specialOffers.length
   });
   
   if (loading) {
@@ -106,20 +108,20 @@ function App() {
   }
 
   // التأكد من وجود البيانات
-  if (!loading && allSections.length === 0) {
+  if (!loading && menuSections.length === 0 && specialOffers.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 font-['Tajawal'] flex items-center justify-center">
         <div className="text-center bg-white/90 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-red-200/50 m-4">
           <h2 className="text-2xl font-bold text-red-800 mb-4" dir="rtl">خطأ في تحميل البيانات</h2>
           <p className="text-red-600 mb-4" dir="rtl">
-            لم يتم العثور على بيانات المنيو. يرجى المحاولة مرة أخرى.
+            جاري تحميل البيانات... يرجى الانتظار
           </p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={refreshData}
             className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors"
             dir="rtl"
           >
-            إعادة تحميل الصفحة
+            إعادة المحاولة
           </button>
         </div>
       </div>
@@ -235,7 +237,9 @@ function App() {
             {allSections.length > 0 && (
               <div className="text-center mb-8">
                 <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border mb-6" style={{ borderColor: '#87512f50' }}>
-                  <h2 className="text-2xl font-bold mb-4" dir="rtl" style={{ color: '#87512f' }}>اختر من قائمة الطعام</h2>
+                  <h2 className="text-2xl font-bold mb-4" dir="rtl" style={{ color: '#87512f' }}>
+                    اختر من قائمة الطعام ({allSections.length} أقسام متاحة)
+                  </h2>
                 </div>
                 <CategoryButtons
                   sections={allSections}
@@ -274,9 +278,11 @@ function App() {
             {!currentSection && (
               <div className="text-center py-12">
                 <div className="bg-white/90 backdrop-blur-md rounded-2xl p-8 shadow-xl border" style={{ borderColor: '#87512f50' }}>
-                  <h2 className="text-2xl font-bold mb-4" dir="rtl" style={{ color: '#87512f' }}>القسم غير موجود</h2>
+                  <h2 className="text-2xl font-bold mb-4" dir="rtl" style={{ color: '#87512f' }}>
+                    القسم غير موجود ({activeSection})
+                  </h2>
                   <p className="text-gray-600 mb-4" dir="rtl">
-                    لم يتم العثور على هذا القسم في المنيو
+                    لم يتم العثور على هذا القسم في المنيو. الأقسام المتاحة: {allSections.length}
                   </p>
                   <button
                     onClick={() => setActiveSection('home')}
@@ -286,6 +292,13 @@ function App() {
                   >
                     العودة للرئيسية
                   </button>
+                </div>
+                <div className="mt-4 text-xs text-gray-500" dir="rtl">
+                  <p>معلومات التشخيص:</p>
+                  <p>أقسام المنيو: {menuSections.length}</p>
+                  <p>العروض الخاصة: {specialOffers.length}</p>
+                  <p>إجمالي الأقسام: {allSections.length}</p>
+                  <p>Supabase متصل: {isSupabaseConnected ? 'نعم' : 'لا'}</p>
                 </div>
               </div>
             )}

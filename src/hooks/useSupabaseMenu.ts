@@ -18,6 +18,7 @@ interface DatabaseMenuItem {
   name: string;
   description?: string;
   price: number;
+  calories?: number;
   image?: string;
   popular: boolean;
   new: boolean;
@@ -44,6 +45,7 @@ interface DatabaseSpecialOffer {
   offer_price: number;
   valid_until: string;
   image?: string;
+  calories?: number;
   active: boolean;
   created_at: string;
   updated_at: string;
@@ -156,22 +158,53 @@ export const useSupabaseMenu = () => {
 
   // تحويل البيانات لتتوافق مع الواجهة الحالية
   const getFormattedMenuSections = () => {
-    // إذا لم يكن Supabase متصل أو لا توجد بيانات، استخدم البيانات الافتراضية
-    if (!isSupabaseConnected || menuSections.length === 0) {
-      console.log('🔄 Using fallback menu sections');
-      return fallbackMenuSections;
-    }
-
-    console.log(`🔄 Formatting ${menuSections.length} Supabase menu sections`);
+    console.log(`🔄 Formatting menu sections - Supabase connected: ${isSupabaseConnected}, sections count: ${menuSections.length}`);
     
-    return menuSections.map(section => {
-      const sectionItems = menuItems
+    // استخدام البيانات الافتراضية دائماً لضمان عرض المنيو
+    const sectionsToUse = isSupabaseConnected && menuSections.length > 0 ? menuSections : fallbackMenuSections.map(section => ({
+      id: section.id.toString(),
+      title: section.title,
+      icon: section.icon,
+      image: section.items[0]?.image || '',
+      order_index: section.order_index || 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+
+    const itemsToUse = isSupabaseConnected && menuItems.length > 0 ? menuItems : fallbackMenuSections.flatMap(section => 
+      section.items.map(item => ({
+        id: item.id.toString(),
+        section_id: section.id.toString(),
+        name: item.name,
+        description: item.description || '',
+        price: item.price,
+        calories: item.calories || 0,
+        image: item.image || '',
+        popular: item.popular || false,
+        new: item.new || false,
+        available: item.available !== false,
+        order_index: item.order_index || 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        sizes: item.sizes?.map(size => ({
+          id: `${item.id}-${size.size}`,
+          item_id: item.id.toString(),
+          size: size.size,
+          price: size.price,
+          created_at: new Date().toISOString()
+        }))
+      }))
+    );
+    
+    return sectionsToUse.map(section => {
+      const sectionItems = itemsToUse
         .filter(item => item.section_id === section.id && item.available)
         .map(item => ({
           id: item.id,
           name: item.name,
           description: item.description,
           price: item.price,
+          calories: item.calories,
           image: item.image,
           popular: item.popular,
           new: item.new,
@@ -198,15 +231,24 @@ export const useSupabaseMenu = () => {
   };
 
   const getFormattedSpecialOffers = () => {
-    // إذا لم يكن Supabase متصل أو لا توجد بيانات، استخدم البيانات الافتراضية
-    if (!isSupabaseConnected || specialOffers.length === 0) {
-      console.log('🔄 Using fallback special offers');
-      return fallbackSpecialOffers;
-    }
-
-    console.log(`🔄 Formatting ${specialOffers.length} Supabase special offers`);
+    console.log(`🔄 Formatting special offers - Supabase connected: ${isSupabaseConnected}, offers count: ${specialOffers.length}`);
     
-    return specialOffers
+    // استخدام البيانات الافتراضية دائماً لضمان عرض العروض
+    const offersToUse = isSupabaseConnected && specialOffers.length > 0 ? specialOffers : fallbackSpecialOffers.map(offer => ({
+      id: offer.id,
+      title: offer.title,
+      description: offer.description,
+      original_price: offer.originalPrice,
+      offer_price: offer.offerPrice,
+      valid_until: offer.validUntil,
+      image: offer.image || '',
+      calories: offer.calories || 0,
+      active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+    
+    return offersToUse
       .filter(offer => offer.active)
       .map(offer => ({
         id: offer.id,
@@ -215,7 +257,8 @@ export const useSupabaseMenu = () => {
         originalPrice: offer.original_price,
         offerPrice: offer.offer_price,
         validUntil: offer.valid_until,
-        image: offer.image
+        image: offer.image,
+        calories: offer.calories
       }));
   };
 
@@ -230,12 +273,17 @@ export const useSupabaseMenu = () => {
         
         if (connected) {
           console.log('📡 Loading data from Supabase...');
-          await Promise.allSettled([
-            fetchMenuSections(),
-            fetchMenuItems(),
-            fetchSpecialOffers()
-          ]);
-          console.log('✅ All data loaded successfully from Supabase');
+          try {
+            await Promise.allSettled([
+              fetchMenuSections(),
+              fetchMenuItems(),
+              fetchSpecialOffers()
+            ]);
+            console.log('✅ All data loaded successfully from Supabase');
+          } catch (supabaseError) {
+            console.warn('⚠️ Supabase data loading failed, using fallback data:', supabaseError);
+            setError('تم تحميل البيانات الافتراضية بنجاح');
+          }
         } else {
           console.log('⚠️ Supabase not connected, using fallback data');
           setError('تم تحميل البيانات الافتراضية بنجاح');
