@@ -15,6 +15,8 @@ export const useSupabaseAdmin = () => {
     setError(null);
     
     try {
+      console.log('🔄 Fetching all admin data...');
+      
       // Fetch sections
       const { data: sectionsData, error: sectionsError } = await supabase
         .from('menu_sections')
@@ -22,15 +24,25 @@ export const useSupabaseAdmin = () => {
         .order('order_index');
       
       if (sectionsError) throw sectionsError;
+      console.log('📋 Sections fetched:', sectionsData?.length || 0);
       setSections(sectionsData || []);
       
       // Fetch items
       const { data: itemsData, error: itemsError } = await supabase
         .from('menu_items')
-        .select('*')
+        .select(`
+          *,
+          sizes:menu_item_sizes(
+            id,
+            size,
+            price
+          )
+        `)
         .order('order_index');
       
       if (itemsError) throw itemsError;
+      console.log('🍽️ Items fetched:', itemsData?.length || 0);
+      console.log('📏 Items with sizes:', itemsData?.filter(item => item.sizes && item.sizes.length > 0).length || 0);
       setItems(itemsData || []);
       
       // Fetch offers
@@ -40,8 +52,10 @@ export const useSupabaseAdmin = () => {
         .order('created_at', { ascending: false });
       
       if (offersError) throw offersError;
+      console.log('🎁 Offers fetched:', offersData?.length || 0);
       setOffers(offersData || []);
       
+      console.log('✅ All admin data fetched successfully');
     } catch (err: any) {
       console.error('Error fetching data:', err);
       setError(err.message || 'فشل في تحميل البيانات');
@@ -200,7 +214,7 @@ export const useSupabaseAdmin = () => {
     
     try {
       console.log('➕ Adding new menu item:', item);
-      console.log('Item sizes to add:', item.sizes);
+      console.log('🔍 Item sizes to add:', JSON.stringify(item.sizes, null, 2));
       
       // التحقق من صحة الصورة
       if (item.image && !validateImageUrl(item.image)) {
@@ -243,17 +257,17 @@ export const useSupabaseAdmin = () => {
       }
 
       const newItem = data[0];
-      console.log('New item created with ID:', newItem.id);
+      console.log('✅ New item created with ID:', newItem.id);
 
       // إضافة الأحجام إذا كانت موجودة
       if (item.sizes && item.sizes.length > 0) {
-        console.log('Adding sizes for item:', newItem.id);
+        console.log('📏 Adding sizes for item:', newItem.id);
         const sizesData = item.sizes.map(size => ({
           item_id: newItem.id,
           size: size.size,
           price: size.price
         }));
-        console.log('Sizes data to insert:', sizesData);
+        console.log('📊 Sizes data to insert:', JSON.stringify(sizesData, null, 2));
 
         const { error: sizesError } = await supabase
           .from('menu_item_sizes')
@@ -263,10 +277,22 @@ export const useSupabaseAdmin = () => {
           console.error('❌ Error adding sizes:', sizesError);
           throw new Error(`فشل في إضافة الأحجام: ${sizesError.message}`);
         }
-        console.log('✅ Sizes added successfully');
+        console.log('✅ All sizes added successfully to database');
+        
+        // التحقق من الحفظ
+        const { data: savedSizes, error: checkError } = await supabase
+          .from('menu_item_sizes')
+          .select('*')
+          .eq('item_id', newItem.id);
+          
+        if (checkError) {
+          console.error('❌ Error checking saved sizes:', checkError);
+        } else {
+          console.log('🔍 Verified saved sizes:', JSON.stringify(savedSizes, null, 2));
+        }
       }
 
-      console.log('✅ Menu item added successfully:', newItem);
+      console.log('🎉 Menu item with sizes added successfully');
       await fetchData(); // Refresh data
       return newItem;
     } catch (err: any) {
@@ -285,7 +311,7 @@ export const useSupabaseAdmin = () => {
     
     try {
       console.log('✏️ Updating menu item:', id, updates);
-      console.log('Sizes to update:', updates.sizes);
+      console.log('📏 Sizes to update:', JSON.stringify(updates.sizes, null, 2));
       
       // التحقق من صحة الصورة
       if (updates.image && !validateImageUrl(updates.image)) {
@@ -317,7 +343,7 @@ export const useSupabaseAdmin = () => {
 
       // تحديث الأحجام
       if (updates.sizes !== undefined) {
-        console.log('Updating sizes for item:', id);
+        console.log('🔄 Updating sizes for item:', id);
         // حذف الأحجام القديمة
         const { error: deleteError } = await supabase
           .from('menu_item_sizes')
@@ -328,7 +354,7 @@ export const useSupabaseAdmin = () => {
           console.error('❌ Error deleting old sizes:', deleteError);
           throw deleteError;
         }
-        console.log('✅ Old sizes deleted');
+        console.log('🗑️ Old sizes deleted successfully');
 
         // إضافة الأحجام الجديدة
         if (updates.sizes && updates.sizes.length > 0) {
@@ -337,7 +363,7 @@ export const useSupabaseAdmin = () => {
             size: size.size,
             price: size.price
           }));
-          console.log('New sizes data to insert:', sizesData);
+          console.log('📊 New sizes data to insert:', JSON.stringify(sizesData, null, 2));
 
           const { error: sizesError } = await supabase
             .from('menu_item_sizes')
@@ -347,11 +373,23 @@ export const useSupabaseAdmin = () => {
             console.error('❌ Error updating sizes:', sizesError);
             throw sizesError;
           }
-          console.log('✅ New sizes added successfully');
+          console.log('✅ New sizes added successfully to database');
+          
+          // التحقق من الحفظ
+          const { data: savedSizes, error: checkError } = await supabase
+            .from('menu_item_sizes')
+            .select('*')
+            .eq('item_id', id);
+            
+          if (checkError) {
+            console.error('❌ Error checking saved sizes:', checkError);
+          } else {
+            console.log('🔍 Verified updated sizes:', JSON.stringify(savedSizes, null, 2));
+          }
         }
       }
 
-      console.log('✅ Menu item updated successfully:', data);
+      console.log('🎉 Menu item with sizes updated successfully');
       await fetchData(); // Refresh data
       return data;
     } catch (err: any) {

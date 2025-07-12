@@ -44,6 +44,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
+      console.log('🔄 Admin panel opened, fetching data...');
       fetchData();
     }
   }, [isOpen, fetchData]);
@@ -411,11 +412,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                     {item.sizes && item.sizes.length > 0 && (
                       <div className="mb-2">
                         <p className="text-xs text-gray-600 mb-1">الأحجام:</p>
-                        {item.sizes.map((size, index) => (
+                        <div className="flex flex-wrap gap-1">
+                          {item.sizes.map((size, index) => (
                           <span key={index} className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded mr-1 mb-1">
                             {size.size}: {size.price} ر.س
                           </span>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     )}
                     <div className="flex gap-2 mt-2">
