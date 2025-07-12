@@ -1,6 +1,3 @@
-Here's the fixed version with the missing closing brackets and proper syntax:
-
-```typescript
 import React, { useState, useEffect } from 'react';
 import { useSupabaseAdmin } from '../hooks/useSupabaseAdmin';
 import { MenuSection, MenuItem, SpecialOffer } from '../types/menu';
@@ -23,7 +20,7 @@ const AdminPanel: React.FC = () => {
     addOffer,
     updateOffer,
     deleteOffer,
-    refreshData
+    fetchData
   } = useSupabaseAdmin();
 
   const [activeTab, setActiveTab] = useState<'sections' | 'items' | 'offers'>('sections');
@@ -70,8 +67,8 @@ const AdminPanel: React.FC = () => {
   });
 
   useEffect(() => {
-    refreshData();
-  }, []); // Added missing closing bracket and array dependency
+    fetchData();
+  }, []);
 
   // Filter items based on selected section
   const filteredItems = selectedSectionFilter === 'all' 
@@ -656,26 +653,358 @@ const AdminPanel: React.FC = () => {
 
             {/* Items List */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredItems.map((item) => {
-                const section = sections.find(s => s.id === item.section_id);
-                return (
-                  <div key={item.id} className="bg-white p-6 rounded-lg shadow-md">
-                    {editingItem?.id === item.id ? (
-                      <div className="space-y-4">
-                        <select
-                          value={editingItem.section_id || ''}
-                          onChange={(e) => setEditingItem({ ...editingItem, section_id: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+              {filteredItems.length === 0 ? (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-gray-500">
+                    {selectedSectionFilter === 'all' 
+                      ? 'لا توجد أصناف مضافة بعد'
+                      : `لا توجد أصناف في قسم "${sections.find(s => s.id.toString() === selectedSectionFilter)?.title}"`
+                    }
+                  </p>
+                </div>
+              ) : (
+                filteredItems.map((item) => {
+                  const section = sections.find(s => s.id === item.section_id);
+                  return (
+                    <div key={item.id} className="bg-white p-6 rounded-lg shadow-md">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-semibold">{item.name}</h3>
+                          {item.popular && <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">الأكثر طلباً</span>}
+                          {item.new && <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">جديد</span>}
+                          {!item.available && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">غير متاح</span>}
+                        </div>
+                      </div>
+                      
+                      {section && (
+                        <p className="text-sm text-gray-500 mb-2">
+                          {section.icon} {section.title}
+                        </p>
+                      )}
+                      
+                      {item.description && (
+                        <p className="text-gray-600 text-sm mb-3">{item.description}</p>
+                      )}
+                      
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-lg font-bold text-amber-600">{item.price} ريال</span>
+                        {item.calories && (
+                          <span className="text-sm text-gray-500">{item.calories} سعرة</span>
+                        )}
+                      </div>
+                      
+                      {item.image && (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-32 object-cover rounded-md mb-4"
+                        />
+                      )}
+                      
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setEditingItem(item)}
+                          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors flex items-center gap-1"
                         >
-                          <option value="">اختر القسم</option>
-                          {sections.map((section) => (
-                            <option key={section.id} value={section.id}>
-                              {section.icon} {section.title}
-                            </option>
-                          ))}
-                        </select>
+                          <Edit className="w-4 h-4" />
+                          تعديل
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (confirm('هل أنت متأكد من حذف هذا الصنف؟')) {
+                              deleteItem(item.id);
+                            }
+                          }}
+                          className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors flex items-center gap-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          حذف
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Offers Tab */}
+        {activeTab === 'offers' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold text-gray-900">إدارة العروض الخاصة</h2>
+              <button
+                onClick={() => setShowAddOffer(true)}
+                className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                إضافة عرض جديد
+              </button>
+            </div>
+
+            {/* Add Offer Form */}
+            {showAddOffer && (
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold mb-4">إضافة عرض جديد</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      عنوان العرض *
+                    </label>
+                    <input
+                      type="text"
+                      value={newOffer.title || ''}
+                      onChange={(e) => setNewOffer({ ...newOffer, title: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      placeholder="مثال: عرض خاص على الشاي"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      صالح حتى *
+                    </label>
+                    <input
+                      type="text"
+                      value={newOffer.valid_until || ''}
+                      onChange={(e) => setNewOffer({ ...newOffer, valid_until: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      placeholder="مثال: نهاية الشهر"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      وصف العرض *
+                    </label>
+                    <textarea
+                      value={newOffer.description || ''}
+                      onChange={(e) => setNewOffer({ ...newOffer, description: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      rows={3}
+                      placeholder="وصف تفصيلي للعرض..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      السعر الأصلي *
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={newOffer.original_price || 0}
+                      onChange={(e) => setNewOffer({ ...newOffer, original_price: parseFloat(e.target.value) })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      سعر العرض *
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={newOffer.offer_price || 0}
+                      onChange={(e) => setNewOffer({ ...newOffer, offer_price: parseFloat(e.target.value) })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      السعرات الحرارية
+                    </label>
+                    <input
+                      type="number"
+                      value={newOffer.calories || ''}
+                      onChange={(e) => setNewOffer({ ...newOffer, calories: e.target.value ? parseInt(e.target.value) : undefined })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      رابط الصورة
+                    </label>
+                    <input
+                      type="url"
+                      value={newOffer.image || ''}
+                      onChange={(e) => setNewOffer({ ...newOffer, image: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-2 mt-6">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={newOffer.active !== false}
+                      onChange={(e) => setNewOffer({ ...newOffer, active: e.target.checked })}
+                      className="rounded"
+                    />
+                    <span className="text-sm">العرض نشط</span>
+                  </label>
+                </div>
+
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={handleAddOffer}
+                    className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors flex items-center gap-2"
+                  >
+                    <Save className="w-4 h-4" />
+                    حفظ
+                  </button>
+                  <button
+                    onClick={() => setShowAddOffer(false)}
+                    className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors flex items-center gap-2"
+                  >
+                    <X className="w-4 h-4" />
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Offers List */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {offers.map((offer) => (
+                <div key={offer.id} className="bg-white p-6 rounded-lg shadow-md">
+                  {editingOffer?.id === offer.id ? (
+                    <div className="space-y-4">
+                      <input
+                        type="text"
+                        value={editingOffer.title}
+                        onChange={(e) => setEditingOffer({ ...editingOffer, title: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                      <textarea
+                        value={editingOffer.description}
+                        onChange={(e) => setEditingOffer({ ...editingOffer, description: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        rows={3}
+                      />
+                      <div className="grid grid-cols-2 gap-2">
                         <input
-                          type="text"
-                          value={editingItem.name}
-                          onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-
+                          type="number"
+                          step="0.01"
+                          value={editingOffer.original_price}
+                          onChange={(e) => setEditingOffer({ ...editingOffer, original_price: parseFloat(e.target.value) })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                          placeholder="السعر الأصلي"
+                        />
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={editingOffer.offer_price}
+                          onChange={(e) => setEditingOffer({ ...editingOffer, offer_price: parseFloat(e.target.value) })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                          placeholder="سعر العرض"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={editingOffer.valid_until}
+                        onChange={(e) => setEditingOffer({ ...editingOffer, valid_until: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        placeholder="صالح حتى"
+                      />
+                      <input
+                        type="url"
+                        value={editingOffer.image || ''}
+                        onChange={(e) => setEditingOffer({ ...editingOffer, image: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        placeholder="رابط الصورة"
+                      />
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={editingOffer.active !== false}
+                          onChange={(e) => setEditingOffer({ ...editingOffer, active: e.target.checked })}
+                          className="rounded"
+                        />
+                        <span className="text-sm">العرض نشط</span>
+                      </label>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleUpdateOffer}
+                          className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition-colors flex items-center gap-1"
+                        >
+                          <Save className="w-4 h-4" />
+                          حفظ
+                        </button>
+                        <button
+                          onClick={() => setEditingOffer(null)}
+                          className="bg-gray-500 text-white px-3 py-1 rounded-md hover:bg-gray-600 transition-colors flex items-center gap-1"
+                        >
+                          <X className="w-4 h-4" />
+                          إلغاء
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold">{offer.title}</h3>
+                        <div className="flex items-center gap-1">
+                          {offer.active ? (
+                            <Eye className="w-4 h-4 text-green-500" />
+                          ) : (
+                            <EyeOff className="w-4 h-4 text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                      
+                      <p className="text-gray-600 text-sm mb-3">{offer.description}</p>
+                      
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg font-bold text-amber-600">{offer.offer_price} ريال</span>
+                          <span className="text-sm text-gray-500 line-through">{offer.original_price} ريال</span>
+                        </div>
+                        {offer.calories && (
+                          <span className="text-sm text-gray-500">{offer.calories} سعرة</span>
+                        )}
+                      </div>
+                      
+                      <p className="text-sm text-gray-500 mb-4">صالح حتى: {offer.valid_until}</p>
+                      
+                      {offer.image && (
+                        <img
+                          src={offer.image}
+                          alt={offer.title}
+                          className="w-full h-32 object-cover rounded-md mb-4"
+                        />
+                      )}
+                      
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setEditingOffer(offer)}
+                          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors flex items-center gap-1"
+                        >
+                          <Edit className="w-4 h-4" />
+                          تعديل
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (confirm('هل أنت متأكد من حذف هذا العرض؟')) {
+                              deleteOffer(offer.id);
+                            }
+                          }}
+                          className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors flex items-center gap-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          حذف
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AdminPanel;
