@@ -223,25 +223,6 @@ export const menuSections: MenuSection[] = [
       { id: 'item-74', name: 'تغيير رأس', price: 25, calories: 0, image: 'https://images.pexels.com/photos/96974/pexels-photo-96974.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'تغيير رأس الشيشة بنكهة جديدة' },
       { id: 'item-75', name: 'إضافة ثلج', price: 5, calories: 0, image: 'https://images.pexels.com/photos/96974/pexels-photo-96974.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'إضافة الثلج للشيشة لتجربة أكثر انتعاشاً' }
     ]
-  },
-  {
-    id: 'section-moroccan-food',
-    title: 'الأكلات المغربية',
-    icon: '🇲🇦',
-    items: [
-      { id: 'item-76', name: 'طاجين دجاج', price: 45, calories: 420, popular: true, image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'طاجين دجاج مغربي أصيل بالخضار والتوابل المغربية' },
-      { id: 'item-77', name: 'طاجين لحم', price: 50, calories: 480, image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'طاجين لحم بالبرقوق والتوابل المغربية الأصيلة' },
-      { id: 'item-78', name: 'كسكس مغربي', price: 40, calories: 380, popular: true, image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'كسكس مغربي تقليدي بالخضار واللحم' },
-      { id: 'item-79', name: 'بسطيلة دجاج', price: 35, calories: 320, image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'بسطيلة مغربية محشية بالدجاج واللوز' },
-      { id: 'item-80', name: 'حريرة مغربية', price: 20, calories: 180, image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'حساء الحريرة المغربي التقليدي' },
-      { id: 'item-81', name: 'رفيسة مغربية', price: 25, calories: 220, image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'رفيسة مغربية بالدجاج والخضار' },
-      { id: 'item-82', name: 'مقروض', price: 15, calories: 180, new: true, image: 'https://images.pexels.com/photos/230325/pexels-photo-230325.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'حلوى مغربية تقليدية بالتمر واللوز' },
-      { id: 'item-83', name: 'شباكية', price: 18, calories: 200, new: true, image: 'https://images.pexels.com/photos/230325/pexels-photo-230325.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'حلوى مغربية مقرمشة بالعسل والسمسم' },
-      { id: 'item-84', name: 'غريبة مغربية', price: 12, calories: 150, image: 'https://images.pexels.com/photos/230325/pexels-photo-230325.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'بسكويت مغربي تقليدي باللوز' },
-      { id: 'item-85', name: 'سلو مغربي', price: 20, calories: 250, image: 'https://images.pexels.com/photos/230325/pexels-photo-230325.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'خليط مغربي من اللوز والسمسم والدقيق المحمص' },
-      { id: 'item-86', name: 'ملوي مغربي', price: 8, calories: 120, image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'خبز مغربي رقيق ومقرمش' },
-      { id: 'item-87', name: 'بغرير مغربي', price: 10, calories: 140, image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400', description: 'فطائر مغربية إسفنجية بالعسل' }
-    ]
   }
 ];
 
@@ -253,8 +234,7 @@ export const specialOffers: SpecialOffer[] = [
     originalPrice: 43,
     offerPrice: 35,
     validUntil: '31 ديسمبر 2024',
-    calories: 355,
-    image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400'
+    calories: 355
   },
   {
     id: 'offer-2',
@@ -263,8 +243,7 @@ export const specialOffers: SpecialOffer[] = [
     originalPrice: 54,
     offerPrice: 45,
     validUntil: '31 ديسمبر 2024',
-    calories: 585,
-    image: 'https://images.pexels.com/photos/230325/pexels-photo-230325.jpeg?auto=compress&cs=tinysrgb&w=400'
+    calories: 585
   },
   {
     id: 'offer-3',
@@ -273,27 +252,6 @@ export const specialOffers: SpecialOffer[] = [
     originalPrice: 44,
     offerPrice: 35,
     validUntil: '31 ديسمبر 2024',
-    calories: 630,
-    image: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400'
-  },
-  {
-    id: 'offer-4',
-    title: 'عرض الأكلات المغربية',
-    description: 'طاجين دجاج + كسكس + شاي أتاي',
-    originalPrice: 85,
-    offerPrice: 70,
-    validUntil: '31 ديسمبر 2024',
-    calories: 650,
-    image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400'
-  },
-  {
-    id: 'offer-5',
-    title: 'عرض الحلويات المغربية',
-    description: 'شباكية + مقروض + قهوة عربي',
-    originalPrice: 45,
-    offerPrice: 35,
-    validUntil: '31 ديسمبر 2024',
-    calories: 420,
-    image: 'https://images.pexels.com/photos/230325/pexels-photo-230325.jpeg?auto=compress&cs=tinysrgb&w=400'
+    calories: 630
   }
 ];
