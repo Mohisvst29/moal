@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { MenuSection } from '../types/menu';
 
 interface CategoryButtonsProps {
@@ -7,7 +7,7 @@ interface CategoryButtonsProps {
   onSectionChange: (sectionId: string) => void;
 }
 
-const CategoryButtons: React.FC<CategoryButtonsProps> = ({ sections, activeSection, onSectionChange }) => {
+const CategoryButtons: React.FC<CategoryButtonsProps> = memo(({ sections, activeSection, onSectionChange }) => {
   console.log('CategoryButtons received sections:', {
     count: sections.length,
     sections: sections.map(s => ({ id: s.id, title: s.title, itemsCount: s.items?.length || 0 }))
@@ -52,6 +52,8 @@ const CategoryButtons: React.FC<CategoryButtonsProps> = ({ sections, activeSecti
       ))}
     </div>
   );
-};
+});
+
+CategoryButtons.displayName = 'CategoryButtons';
 
 export default CategoryButtons;

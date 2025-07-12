@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { ShoppingCart, ArrowRight, Settings } from 'lucide-react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -48,7 +48,7 @@ function App() {
   ];
 
   // دمج العروض الخاصة مع أقسام المنيو
-  const allSections = React.useMemo(() => {
+  const allSections = useMemo(() => {
     const sections = [...menuSections];
     
     // إضافة قسم العروض الخاصة إذا كانت موجودة
@@ -79,20 +79,25 @@ function App() {
   const currentSection = allSections.find(section => section.id === activeSection);
 
   // دالة فتح لوحة التحكم
-  const handleAdminClick = () => {
+  const handleAdminClick = useCallback(() => {
     if (isAdminLoggedIn) {
       setIsAdminOpen(true);
     } else {
       setShowLoginModal(true);
     }
-  };
+  }, [isAdminLoggedIn]);
 
   // دالة تسجيل الدخول للأدمن
-  const handleAdminLogin = () => {
+  const handleAdminLogin = useCallback(() => {
     setIsAdminLoggedIn(true);
     setShowLoginModal(false);
     setIsAdminOpen(true);
-  }
+  }, []);
+
+  // تحسين دالة تغيير القسم
+  const handleSectionChange = useCallback((sectionId: string) => {
+    setActiveSection(sectionId);
+  }, []);
 
   // إضافة console.log لتتبع البيانات
   console.log('App State:', {
@@ -252,7 +257,7 @@ function App() {
                 <CategoryButtons
                   sections={allSections}
                   activeSection={activeSection}
-                  onSectionChange={setActiveSection}
+                  onSectionChange={handleSectionChange}
                 />
               </div>
             )}
@@ -262,7 +267,7 @@ function App() {
             {/* Back Button */}
             <div className="mb-6">
               <button
-                onClick={() => setActiveSection('home')}
+                onClick={() => handleSectionChange('home')}
                 className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
                 style={{ color: '#87512f' }}
                 dir="rtl"
@@ -293,7 +298,7 @@ function App() {
                     لم يتم العثور على هذا القسم في المنيو. الأقسام المتاحة: {allSections.length}
                   </p>
                   <button
-                    onClick={() => setActiveSection('home')}
+                    onClick={() => handleSectionChange('home')}
                     className="text-white px-6 py-2 rounded-lg transition-colors"
                     style={{ backgroundColor: '#87512f' }}
                     dir="rtl"
