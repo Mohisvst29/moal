@@ -45,9 +45,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     order_index: 0
   });
 
-  // Image upload states
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string>('');
+  // Image upload states for different types
+  const [uploadingImage, setUploadingImage] = useState<{
+    section: boolean;
+    item: boolean;
+    offer: boolean;
+  }>({
+    section: false,
+    item: false,
+    offer: false
+  });
 
   const [newItem, setNewItem] = useState<Partial<MenuItem>>({
     name: '',
@@ -192,38 +199,62 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
   };
 
   // Handle image upload
-  const handleImageUpload = async (file: File, type: 'section' | 'item' | 'offer') => {
+  const handleImageUpload = async (file: File, type: 'section' | 'item' | 'offer', isEditing: boolean = false) => {
     if (!file) return;
     
-    setUploadingImage(true);
+    console.log('📸 Starting image upload:', { fileName: file.name, fileSize: file.size, type, isEditing });
+    
+    // التحقق من نوع الملف
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('نوع الملف غير مدعوم. يرجى استخدام JPEG, PNG, GIF, أو WebP');
+      return;
+    }
+
+    // التحقق من حجم الملف (5MB كحد أقصى)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      alert('حجم الملف كبير جداً. الحد الأقصى 5MB');
+      return;
+    }
+    
+    setUploadingImage(prev => ({ ...prev, [type]: true }));
     try {
       const base64Image = await convertImageToBase64(file);
-      setImagePreview(base64Image);
+      console.log('✅ Image converted to base64, length:', base64Image.length);
       
       if (type === 'section') {
-        if (editingSection) {
+        if (isEditing && editingSection) {
           setEditingSection({...editingSection, image: base64Image});
+          console.log('📝 Updated editing section image');
         } else {
           setNewSection({...newSection, image: base64Image});
+          console.log('📝 Updated new section image');
         }
       } else if (type === 'item') {
-        if (editingItem) {
+        if (isEditing && editingItem) {
           setEditingItem({...editingItem, image: base64Image});
+          console.log('📝 Updated editing item image');
         } else {
           setNewItem({...newItem, image: base64Image});
+          console.log('📝 Updated new item image');
         }
       } else if (type === 'offer') {
-        if (editingOffer) {
+        if (isEditing && editingOffer) {
           setEditingOffer({...editingOffer, image: base64Image});
+          console.log('📝 Updated editing offer image');
         } else {
           setNewOffer({...newOffer, image: base64Image});
+          console.log('📝 Updated new offer image');
         }
       }
+      
+      alert('تم رفع الصورة بنجاح! ✅');
     } catch (error) {
       console.error('Error uploading image:', error);
       alert('فشل في رفع الصورة');
     } finally {
-      setUploadingImage(false);
+      setUploadingImage(prev => ({ ...prev, [type]: false }));
     }
   };
 
@@ -241,38 +272,52 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
   const ImageUploadComponent = ({ 
     currentImage, 
     onImageUpload, 
-    type 
+    type,
+    isEditing = false,
+    label = "الصورة"
   }: { 
     currentImage?: string; 
     onImageUpload: (file: File) => void; 
     type: 'section' | 'item' | 'offer';
+    isEditing?: boolean;
+    label?: string;
   }) => (
     <div className="space-y-2" dir="rtl">
-      <label className="block text-sm font-medium text-gray-700">الصورة</label>
-      <div className="flex items-center gap-4">
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <div className="space-y-2">
         <input
           type="file"
           accept="image/*"
           onChange={(e) => {
             const file = e.target.files?.[0];
-            if (file) onImageUpload(file);
+            if (file) {
+              console.log('📁 File selected:', file.name);
+              onImageUpload(file);
+            }
           }}
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          disabled={uploadingImage}
+          className="block w-full text-sm text-gray-500 file:ml-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 border border-gray-300 rounded-lg p-2"
+          disabled={uploadingImage[type]}
         />
-        {uploadingImage && (
-          <div className="text-blue-500 text-sm">جاري الرفع...</div>
+        {uploadingImage[type] && (
+          <div className="flex items-center gap-2 text-amber-600 text-sm">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-600"></div>
+            جاري رفع الصورة...
+          </div>
         )}
+        {currentImage && (
+          <div className="mt-2">
+            <p className="text-xs text-gray-600 mb-1">معاينة الصورة:</p>
+            <img 
+              src={currentImage} 
+              alt="معاينة الصورة" 
+              className="w-24 h-24 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+            />
+          </div>
+        )}
+        <p className="text-xs text-gray-500">
+          أنواع الملفات المدعومة: JPG, PNG, GIF, WebP (حد أقصى 5MB)
+        </p>
       </div>
-      {currentImage && (
-        <div className="mt-2">
-          <img 
-            src={currentImage} 
-            alt="معاينة الصورة" 
-            className="w-20 h-20 object-cover rounded-lg border"
-          />
-        </div>
-      )}
     </div>
   );
 
@@ -380,8 +425,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                     <div className="md:col-span-2">
                       <ImageUploadComponent
                         currentImage={newSection.image}
-                        onImageUpload={(file) => handleImageUpload(file, 'section')}
+                        onImageUpload={(file) => handleImageUpload(file, 'section', false)}
                         type="section"
+                        label="صورة القسم"
                       />
                     </div>
                   </div>
@@ -424,6 +470,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                           className="w-full p-2 border border-gray-300 rounded mb-2"
                           dir="rtl"
                         />
+                        <div className="mb-2">
+                          <ImageUploadComponent
+                            currentImage={editingSection.image}
+                            onImageUpload={(file) => handleImageUpload(file, 'section', true)}
+                            type="section"
+                            isEditing={true}
+                            label="تغيير صورة القسم"
+                          />
+                        </div>
                         <div className="flex gap-2">
                           <button
                             onClick={handleUpdateSection}
@@ -598,6 +653,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                     ))}
                   </div>
 
+                  {/* Image Upload for New Item */}
+                  <div className="mt-4">
+                    <ImageUploadComponent
+                      currentImage={newItem.image}
+                      onImageUpload={(file) => handleImageUpload(file, 'item', false)}
+                      type="item"
+                      label="صورة الصنف"
+                    />
+                  </div>
+
                   <div className="flex gap-2 mt-4">
                     <button
                       onClick={handleAddItem}
@@ -726,6 +791,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                               />
                               متاح
                             </label>
+                          </div>
+                          
+                          {/* Image Upload for Editing Item */}
+                          <div className="mt-4">
+                            <ImageUploadComponent
+                              currentImage={editingItem.image}
+                              onImageUpload={(file) => handleImageUpload(file, 'item', true)}
+                              type="item"
+                              isEditing={true}
+                              label="تغيير صورة الصنف"
+                            />
                           </div>
                         </div>
                         
@@ -861,6 +937,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                       placeholder="وصف العرض"
                     />
                   </div>
+                  
+                  {/* Image Upload for New Offer */}
+                  <div className="mt-4">
+                    <ImageUploadComponent
+                      currentImage={newOffer.image}
+                      onImageUpload={(file) => handleImageUpload(file, 'offer', false)}
+                      type="offer"
+                      label="صورة العرض"
+                    />
+                  </div>
+                  
                   <div className="flex gap-2 mt-4">
                     <button
                       onClick={handleAddOffer}
@@ -932,6 +1019,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                               value={editingOffer.validUntil || ''}
                               onChange={(e) => setEditingOffer({...editingOffer, validUntil: e.target.value})}
                               className="w-full p-2 border border-gray-300 rounded"
+                            />
+                          </div>
+                          
+                          {/* Image Upload for Editing Offer */}
+                          <div className="mt-4">
+                            <ImageUploadComponent
+                              currentImage={editingOffer.image}
+                              onImageUpload={(file) => handleImageUpload(file, 'offer', true)}
+                              type="offer"
+                              isEditing={true}
+                              label="تغيير صورة العرض"
                             />
                           </div>
                         </div>
