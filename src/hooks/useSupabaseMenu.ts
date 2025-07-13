@@ -368,7 +368,8 @@ export const useSupabaseMenu = () => {
       setIsSupabaseConnected(false);
     }
   };
-    
+
+  useEffect(() => {    
     const loadData = async () => {
       setLoading(true);
       setError(null);
@@ -418,6 +419,57 @@ export const useSupabaseMenu = () => {
     loadData();
   }, [dataLoaded]);
 
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        console.log('🚀 Starting data load...');
+        const connected = await checkSupabaseConnection();
+        
+        if (connected) {
+          console.log('📡 Loading data from Supabase...');
+          try {
+            const results = await Promise.allSettled([
+              fetchMenuSections(),
+              fetchMenuItems(),
+              fetchSpecialOffers()
+            ]);
+            
+            // التحقق من نتائج العمليات
+            const failedOperations = results.filter(result => result.status === 'rejected');
+            if (failedOperations.length > 0) {
+              console.warn('⚠️ Some Supabase operations failed, using fallback data');
+              setError('فشل في تحميل بعض البيانات من الخادم، تم استخدام البيانات المحلية');
+              setIsSupabaseConnected(false);
+            } else {
+              console.log('✅ All data loaded successfully from Supabase');
+            }
+          } catch (supabaseError) {
+            console.warn('⚠️ Supabase data loading failed, using fallback data:', supabaseError);
+            setError('فشل في تحميل البيانات من الخادم، تم استخدام البيانات المحلية');
+            setIsSupabaseConnected(false);
+          }
+        } else {
+          console.log('⚠️ Supabase not connected, using fallback data');
+          setError('لا يمكن الاتصال بقاعدة البيانات، تم استخدام البيانات المحلية');
+        }
+      } catch (err) {
+        console.error('❌ Failed to load data:', err);
+        setError('حدث خطأ في تحميل البيانات، تم استخدام البيانات المحلية');
+        setIsSupabaseConnected(false);
+      } finally {
+        setDataLoaded(true);
+        setLoading(false);
+        console.log('🏁 Data loading completed');
+      }
+    };
+
+    if (!dataLoaded) {
+      loadData();
+    }
+  }, [dataLoaded]);
   // التأكد من إرجاع البيانات دائماً
   const finalMenuSections = getFormattedMenuSections;
   const finalSpecialOffers = getFormattedSpecialOffers;
