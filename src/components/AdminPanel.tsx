@@ -25,16 +25,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     deleteItem,
     addOffer,
     updateOffer,
-    deleteOffer
+    deleteOffer,
+    fetchReviews,
+    approveReview,
+    deleteReview
   } = useSupabaseAdmin();
 
-  const [activeTab, setActiveTab] = useState<'sections' | 'items' | 'offers'>('sections');
+  const [activeTab, setActiveTab] = useState<'sections' | 'items' | 'offers' | 'reviews'>('sections');
   const [editingSection, setEditingSection] = useState<MenuSection | null>(null);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [editingOffer, setEditingOffer] = useState<SpecialOffer | null>(null);
   const [showAddSection, setShowAddSection] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [showAddOffer, setShowAddOffer] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [selectedSectionFilter, setSelectedSectionFilter] = useState<string>('all');
 
   // Form states
@@ -85,8 +89,38 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       fetchData();
+      loadReviews();
     }
   }, [isOpen, fetchData]);
+
+  const loadReviews = async () => {
+    try {
+      const reviewsData = await fetchReviews();
+      setReviews(reviewsData);
+    } catch (error) {
+      console.error('Error loading reviews:', error);
+    }
+  };
+
+  const handleApproveReview = async (id: string) => {
+    try {
+      await approveReview(id);
+      await loadReviews(); // Refresh reviews
+    } catch (error) {
+      console.error('Error approving review:', error);
+    }
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    if (window.confirm('هل أنت متأكد من حذف هذا التقييم؟')) {
+      try {
+        await deleteReview(id);
+        await loadReviews(); // Refresh reviews
+      } catch (error) {
+        console.error('Error deleting review:', error);
+      }
+    }
+  };
 
   // Filter items based on selected section
   const filteredItems = selectedSectionFilter === 'all' 
@@ -404,6 +438,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
               dir="rtl"
             >
               العروض الخاصة ({offers.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('reviews')}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+                activeTab === 'reviews'
+                  ? 'bg-white text-amber-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+              dir="rtl"
+            >
+              التقييمات ({reviews.length})
             </button>
           </div>
 
@@ -1116,6 +1161,87 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Reviews Tab */}
+          {activeTab === 'reviews' && (
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-800" dir="rtl">إدارة التقييمات</h2>
+              </div>
+
+              {/* Reviews List */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {reviews.map((review) => (
+                  <div key={review.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3" dir="rtl">
+                      <div>
+                        <h3 className="font-bold text-gray-800">{review.customer_name}</h3>
+                        <div className="flex gap-1 mt-1">
+                          {Array.from({ length: 5 }, (_, index) => (
+                            <span
+                              key={index}
+                              className={`text-sm ${
+                                index < review.rating ? 'text-yellow-400' : 'text-gray-300'
+                              }`}
+                            >
+                              ⭐
+                            </span>
+                          ))}
+                          <span className="text-sm text-gray-600 mr-2">
+                            ({review.rating}/5)
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            review.approved
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}
+                        >
+                          {review.approved ? 'معتمد' : 'في الانتظار'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <p className="text-gray-700 text-sm mb-3" dir="rtl">
+                      "{review.comment}"
+                    </p>
+                    
+                    <div className="text-xs text-gray-500 mb-3" dir="rtl">
+                      {new Date(review.created_at).toLocaleDateString('ar-SA')}
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      {!review.approved && (
+                        <button
+                          onClick={() => handleApproveReview(review.id)}
+                          className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
+                          dir="rtl"
+                        >
+                          اعتماد
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteReview(review.id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+                        dir="rtl"
+                      >
+                        حذف
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {reviews.length === 0 && (
+                <div className="text-center py-8">
+                  <p className="text-gray-500" dir="rtl">لا توجد تقييمات حتى الآن</p>
+                </div>
+              )}
             </div>
           )}
         </div>

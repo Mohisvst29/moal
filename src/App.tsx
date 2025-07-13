@@ -8,6 +8,8 @@ import Cart from './components/Cart';
 import AdminPanel from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
 import VideoBackground from './components/VideoBackground';
+import MenuActions from './components/MenuActions';
+import ReviewsSection from './components/ReviewsSection';
 import { useSupabaseMenu } from './hooks/useSupabaseMenu';
 import { useCart } from './hooks/useCart';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -261,6 +263,9 @@ function App() {
                 />
               </div>
             )}
+
+            {/* Reviews Section */}
+            <ReviewsSection />
           </>
         ) : (
           <div>
@@ -320,6 +325,18 @@ function App() {
       </main>
 
       <Footer />
+
+      {/* Menu Actions - الأزرار الجديدة */}
+      {activeSection === 'home' && (
+        <MenuActions
+          onGoToMenu={() => {
+            // الانتقال لأول قسم متاح
+            if (allSections.length > 0) {
+              handleSectionChange(allSections[0].id);
+            }
+          }}
+        />
+      )}
 
       {/* Cart */}
       <div className="relative z-50">
