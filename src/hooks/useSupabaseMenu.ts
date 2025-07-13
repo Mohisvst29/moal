@@ -77,19 +77,26 @@ export const useSupabaseMenu = () => {
       }
       
       // اختبار الاتصال
-      const { data, error } = await supabase.from('menu_sections').select('id').limit(1);
-      
-      if (error) {
-        console.error('❌ Supabase connection failed:', error);
+      try {
+        const { data, error } = await supabase.from('menu_sections').select('id').limit(1);
+        
+        if (error) {
+          console.error('❌ Supabase connection failed:', error);
+          setIsSupabaseConnected(false);
+          return false;
+        }
+        
+        console.log('✅ Supabase connected successfully');
+        setIsSupabaseConnected(true);
+        return true;
+      } catch (fetchError) {
+        console.warn('⚠️ Supabase fetch failed (network/config issue):', fetchError);
         setIsSupabaseConnected(false);
         return false;
       }
       
-      console.log('✅ Supabase connected successfully');
-      setIsSupabaseConnected(true);
-      return true;
     } catch (err) {
-      console.error('❌ Supabase connection error:', err);
+      console.warn('⚠️ Supabase connection error:', err);
       setIsSupabaseConnected(false);
       return false;
     }
@@ -99,18 +106,24 @@ export const useSupabaseMenu = () => {
   const fetchMenuSections = async () => {
     try {
       console.log('📋 Fetching menu sections...');
-      const { data, error } = await supabase
-        .from('menu_sections')
-        .select('*')
-        .order('order_index');
+      try {
+        const { data, error } = await supabase
+          .from('menu_sections')
+          .select('*')
+          .order('order_index');
 
-      if (error) throw error;
+        if (error) throw error;
+        
+        console.log(`✅ Menu sections fetched: ${data?.length || 0} sections`);
+        setMenuSections(data || []);
+        return data || [];
+      } catch (fetchError) {
+        console.warn('⚠️ Menu sections fetch failed:', fetchError);
+        throw fetchError;
+      }
       
-      console.log(`✅ Menu sections fetched: ${data?.length || 0} sections`);
-      setMenuSections(data || []);
-      return data || [];
     } catch (err) {
-      console.error('❌ Error fetching menu sections:', err);
+      console.warn('⚠️ Error fetching menu sections:', err);
       throw err;
     }
   };
@@ -119,27 +132,33 @@ export const useSupabaseMenu = () => {
   const fetchMenuItems = async () => {
     try {
       console.log('🍽️ Fetching menu items...');
-      const { data, error } = await supabase
-        .from('menu_items')
-        .select(`
-          *,
-          sizes:menu_item_sizes(
-            id,
-            size,
-            price
-          )
-        `)
-        .eq('available', true)
-        .order('order_index');
+      try {
+        const { data, error } = await supabase
+          .from('menu_items')
+          .select(`
+            *,
+            sizes:menu_item_sizes(
+              id,
+              size,
+              price
+            )
+          `)
+          .eq('available', true)
+          .order('order_index');
 
-      if (error) throw error;
+        if (error) throw error;
+        
+        console.log(`✅ Menu items fetched: ${data?.length || 0} items`);
+        console.log('Items with sizes:', data?.filter(item => item.sizes && item.sizes.length > 0).length);
+        setMenuItems(data || []);
+        return data || [];
+      } catch (fetchError) {
+        console.warn('⚠️ Menu items fetch failed:', fetchError);
+        throw fetchError;
+      }
       
-      console.log(`✅ Menu items fetched: ${data?.length || 0} items`);
-      console.log('Items with sizes:', data?.filter(item => item.sizes && item.sizes.length > 0).length);
-      setMenuItems(data || []);
-      return data || [];
     } catch (err) {
-      console.error('❌ Error fetching menu items:', err);
+      console.warn('⚠️ Error fetching menu items:', err);
       throw err;
     }
   };
@@ -326,12 +345,21 @@ export const useSupabaseMenu = () => {
         if (connected) {
           console.log('📡 Loading data from Supabase...');
           try {
-            await Promise.allSettled([
+            const results = await Promise.allSettled([
               fetchMenuSections(),
               fetchMenuItems(),
               fetchSpecialOffers()
             ]);
-            console.log('✅ All data loaded successfully from Supabase');
+            
+            // التحقق من نتائج العمليات
+            const failedOperations = results.filter(result => result.status === 'rejected');
+            if (failedOperations.length > 0) {
+              console.warn('⚠️ Some Supabase operations failed, using fallback data');
+              setError('فشل في تحميل بعض البيانات من الخادم، تم استخدام البيانات المحلية');
+              setIsSupabaseConnected(false);
+            } else {
+              console.log('✅ All data loaded successfully from Supabase');
+            }
           } catch (supabaseError) {
             console.warn('⚠️ Supabase data loading failed, using fallback data:', supabaseError);
             setError('فشل في تحميل البيانات من الخادم، تم استخدام البيانات المحلية');
