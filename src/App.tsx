@@ -48,6 +48,18 @@ function App() {
     clearCart
   } = useCart();
 
+  // تحسين الأداء بتأخير تحميل الفيديو
+  const [showVideo, setShowVideo] = useState(false);
+  
+  useEffect(() => {
+    if (activeSection === 'home') {
+      const timer = setTimeout(() => setShowVideo(true), 500);
+      return () => clearTimeout(timer);
+    } else {
+      setShowVideo(false);
+    }
+  }, [activeSection]);
+
   const backgroundVideos = [
     { id: "Nu8kIIL-CDA", title: "إعلان القهوة التجاري" },
     { id: "T3AHBe0I0yc", title: "أجواء مقهى موال مراكش" }
@@ -110,28 +122,17 @@ function App() {
   // إضافة console.log لتتبع البيانات
   console.log('App State:', {
     loading,
-    error,
     isSupabaseConnected,
     allSectionsCount: allSections.length,
     specialOffersCount: specialOffers.length,
     activeSection,
-    currentSection: currentSection ? currentSection.title : 'Not found',
-    menuSectionsFromHook: menuSections.length,
-    specialOffersFromHook: specialOffers.length
+    currentSection: currentSection ? currentSection.title : 'Not found'
   });
   
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 font-['Tajawal'] flex items-center justify-center">
-        <LoadingSpinner message="جاري تحميل المنيو..." />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 font-['Tajawal']">
       {/* Video Background */}
-      {activeSection === 'home' && (
+      {activeSection === 'home' && showVideo && (
         <div className="fixed inset-0 z-0">
           <div className="absolute inset-0 bg-black">
             <iframe
@@ -140,6 +141,7 @@ function App() {
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
+              loading="lazy"
             />
           </div>
           {/* Dark overlay for better text readability */}

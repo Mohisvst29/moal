@@ -331,8 +331,43 @@ export const useSupabaseMenu = () => {
   }, [menuSections, specialOffers]);
 
   useEffect(() => {
-    // تجنب إعادة التحميل إذا كانت البيانات محملة بالفعل
-    if (dataLoaded) return;
+    // تحميل فوري للبيانات المحلية أولاً
+    if (!dataLoaded) {
+      console.log('🚀 Loading fallback data immediately...');
+      setLoading(false); // إظهار البيانات المحلية فوراً
+      setDataLoaded(true);
+      
+      // ثم محاولة تحميل بيانات Supabase في الخلفية
+      loadSupabaseDataInBackground();
+    }
+  }, []);
+
+  const loadSupabaseDataInBackground = async () => {
+    try {
+      console.log('🔄 Loading Supabase data in background...');
+      const connected = await checkSupabaseConnection();
+      
+      if (connected) {
+        console.log('📡 Loading data from Supabase...');
+        const results = await Promise.allSettled([
+          fetchMenuSections(),
+          fetchMenuItems(),
+          fetchSpecialOffers()
+        ]);
+        
+        const failedOperations = results.filter(result => result.status === 'rejected');
+        if (failedOperations.length > 0) {
+          console.warn('⚠️ Some Supabase operations failed, keeping fallback data');
+          setIsSupabaseConnected(false);
+        } else {
+          console.log('✅ Supabase data loaded successfully');
+        }
+      }
+    } catch (err) {
+      console.warn('⚠️ Background Supabase loading failed:', err);
+      setIsSupabaseConnected(false);
+    }
+  };
     
     const loadData = async () => {
       setLoading(true);
