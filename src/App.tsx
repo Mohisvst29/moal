@@ -250,27 +250,6 @@ function App() {
             </div>
 
             {/* Special Offers Section */}
-            {specialOffers && specialOffers.length > 0 && (
-              <SpecialOffers
-                offers={specialOffers}
-                onAddToCart={(offer) => {
-                  const offerAsItem = {
-                    id: `offer-${offer.id}`,
-                    name: offer.title,
-                    description: offer.description,
-                    price: offer.offerPrice,
-                    image: offer.image,
-                    popular: true,
-                    new: true,
-                    available: true,
-                    originalPrice: offer.originalPrice,
-                    isOffer: true,
-                    calories: offer.calories
-                  };
-                  addToCart(offerAsItem);
-                }}
-              />
-            )}
 
             {/* Category Buttons */}
             {allSections.length > 0 && (
