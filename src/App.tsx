@@ -250,6 +250,12 @@ function App() {
             </div>
 
             {/* Special Offers Section */}
+            {specialOffers && specialOffers.length > 0 && (
+              <SpecialOffers
+                offers={specialOffers}
+                onAddToCart={addToCart}
+              />
+            )}
 
             {/* Category Buttons */}
             {allSections.length > 0 && (

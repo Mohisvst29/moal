@@ -282,8 +282,33 @@ export const useSupabaseMenu = () => {
 
   // دمج العروض الخاصة مع أقسام المنيو
   const allSections = useMemo(() => {
-    // إرجاع أقسام المنيو فقط بدون العروض الخاصة
-    return [...menuSections];
+    const sections = [...getFormattedMenuSections];
+    
+    // إضافة قسم العروض الخاصة إذا كانت موجودة
+    if (getFormattedSpecialOffers && getFormattedSpecialOffers.length > 0) {
+      const offersAsItems = getFormattedSpecialOffers.map(offer => ({
+        id: `offer-${offer.id}`,
+        name: offer.title,
+        description: offer.description,
+        price: offer.offerPrice,
+        image: offer.image,
+        popular: true,
+        new: true,
+        available: true,
+        originalPrice: offer.originalPrice,
+        isOffer: true,
+        calories: offer.calories
+      }));
+      
+      sections.unshift({
+        id: 'special-offers',
+        title: 'العروض الخاصة',
+        icon: '🎁',
+        items: offersAsItems
+      });
+    }
+    
+    return sections;
   }, [menuSections, specialOffers]);
 
   useEffect(() => {

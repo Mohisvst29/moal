@@ -244,14 +244,5 @@ export const specialOffers: SpecialOffer[] = [
     offerPrice: 45,
     validUntil: '31 ديسمبر 2024',
     calories: 585
-  },
-  {
-    id: 'offer-3',
-    title: 'عرض البيتزا العائلي',
-    description: 'بيتزا كبيرة + مشروبين غازي',
-    originalPrice: 44,
-    offerPrice: 35,
-    validUntil: '31 ديسمبر 2024',
-    calories: 630
   }
 ];
