@@ -228,17 +228,17 @@ export const menuSections: MenuSection[] = [
 
 export const specialOffers: SpecialOffer[] = [
   {
-    id: 'offer-1',
-    title: 'عرض الإفطار المميز',
-    description: 'قهوة + كرواسون + عصير طازج',
-    originalPrice: 43,
+    id: 'offer-pizza-family',
+    title: 'عرض البيتزا العائلي',
+    description: 'بيتزا كبيرة + مشروبين غازيين + كوكيز',
+    originalPrice: 44,
     offerPrice: 35,
     validUntil: '31 ديسمبر 2024',
-    calories: 355,
-    image: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=400'
+    calories: 630,
+    image: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400'
   },
   {
-    id: 'offer-2',
+    id: 'offer-evening-special',
     title: 'عرض المساء الخاص',
     description: 'شاي أتاي + كيك نوتيلا + كوكيز',
     originalPrice: 54,
@@ -246,5 +246,15 @@ export const specialOffers: SpecialOffer[] = [
     validUntil: '31 ديسمبر 2024',
     calories: 585,
     image: 'https://images.pexels.com/photos/230325/pexels-photo-230325.jpeg?auto=compress&cs=tinysrgb&w=400'
+  },
+  {
+    id: 'offer-breakfast-special',
+    title: 'عرض الإفطار المميز',
+    description: 'قهوة + كرواسون + عصير طازج',
+    originalPrice: 43,
+    offerPrice: 35,
+    validUntil: '31 ديسمبر 2024',
+    calories: 355,
+    image: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=400'
   }
 ];

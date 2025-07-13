@@ -268,12 +268,7 @@ function App() {
 
                 {/* زر اذهب للمنيو الآن */}
                 <button
-                  onClick={() => {
-                    const regularSections = menuSections.filter(section => section.id !== 'special-offers');
-                    if (regularSections.length > 0) {
-                      handleSectionChange(regularSections[0].id.toString());
-                    }
-                  }}
+                  onClick={() => handleSectionChange('menu-categories')}
                   className="bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold text-lg"
                   dir="rtl"
                 >
@@ -306,6 +301,40 @@ function App() {
             {/* Reviews Section */}
             <ReviewsSection />
           </>
+        ) : activeSection === 'menu-categories' ? (
+          <div>
+            {/* Back Button */}
+            <div className="mb-6">
+              <button
+                onClick={() => handleSectionChange('home')}
+                className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
+                style={{ color: '#87512f' }}
+                dir="rtl"
+              >
+                <ArrowRight className="w-5 h-5" />
+                <span>العودة للرئيسية</span>
+              </button>
+            </div>
+
+            {/* Category Selection */}
+            <div className="text-center mb-8">
+              <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-amber-200/50">
+                <h2 className="text-3xl font-bold mb-4" dir="rtl" style={{ color: '#87512f' }}>
+                  اختر القسم المطلوب
+                </h2>
+                <p className="text-gray-600" dir="rtl">
+                  اختر من الأقسام التالية لتصفح المنيو
+                </p>
+              </div>
+            </div>
+
+            {/* Category Buttons */}
+            <CategoryButtons
+              sections={menuSections}
+              activeSection={activeSection}
+              onSectionChange={handleSectionChange}
+            />
+          </div>
         ) : activeSection === 'special-offers' ? (
           <div>
             {/* Back Button */}
