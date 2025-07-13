@@ -148,6 +148,13 @@ export const useSupabaseMenu = () => {
   const fetchSpecialOffers = async () => {
     try {
       console.log('🎁 Fetching special offers...');
+      
+      // التحقق من اتصال Supabase أولاً
+      if (!isSupabaseConnected) {
+        console.log('⚠️ Supabase not connected, skipping special offers fetch');
+        return [];
+      }
+      
       const { data, error } = await supabase
         .from('special_offers')
         .select('*')
@@ -160,8 +167,10 @@ export const useSupabaseMenu = () => {
       setSpecialOffers(data || []);
       return data || [];
     } catch (err) {
-      console.error('❌ Error fetching special offers:', err);
-      throw err;
+      console.warn('⚠️ Error fetching special offers, using fallback data:', err);
+      // لا نرمي الخطأ، بل نستخدم البيانات الافتراضية
+      setSpecialOffers([]);
+      return [];
     }
   };
 
