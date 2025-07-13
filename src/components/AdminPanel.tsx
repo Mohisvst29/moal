@@ -83,7 +83,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
         loadReviews();
       }
     }
-  }, [isOpen, activeTab]);
+  }, [isOpen, activeTab, fetchData]);
 
   const loadReviews = async () => {
     setLoadingReviews(true);
@@ -378,10 +378,292 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {/* Other tabs content remains the same... */}
-          {activeTab !== 'reviews' && (
-            <div className="text-center py-8">
-              <p className="text-gray-500" dir="rtl">محتوى التبويبات الأخرى...</p>
+          {/* Sections Tab */}
+          {activeTab === 'sections' && (
+            <div>
+              <div className="flex justify-between items-center mb-6" dir="rtl">
+                <h3 className="text-xl font-bold">إدارة الأقسام</h3>
+                <button
+                  onClick={() => setShowAddSection(true)}
+                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  إضافة قسم جديد
+                </button>
+              </div>
+
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="text-gray-600 mt-2" dir="rtl">جاري تحميل الأقسام...</p>
+                </div>
+              ) : sections.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500" dir="rtl">لا توجد أقسام حتى الآن</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {sections.map((section) => (
+                    <div key={section.id} className="border rounded-lg p-4 bg-gray-50">
+                      <div className="flex justify-between items-start mb-3" dir="rtl">
+                        <div>
+                          <h4 className="font-bold text-gray-800 flex items-center gap-2">
+                            <span>{section.icon}</span>
+                            <span>{section.title}</span>
+                          </h4>
+                          <p className="text-sm text-gray-600">ترتيب: {section.order_index}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingSection(section);
+                              setSectionForm({
+                                title: section.title,
+                                icon: section.icon,
+                                image: section.image || '',
+                                order_index: section.order_index
+                              });
+                            }}
+                            className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteSection(section.id.toString())}
+                            className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                      {section.image && (
+                        <img src={section.image} alt={section.title} className="w-full h-32 object-cover rounded" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add/Edit Section Form */}
+              {(showAddSection || editingSection) && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+                  <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                    <h3 className="text-xl font-bold mb-4" dir="rtl">
+                      {editingSection ? 'تعديل القسم' : 'إضافة قسم جديد'}
+                    </h3>
+                    
+                    <div className="space-y-4" dir="rtl">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">اسم القسم</label>
+                        <input
+                          type="text"
+                          value={sectionForm.title}
+                          onChange={(e) => setSectionForm(prev => ({ ...prev, title: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="أدخل اسم القسم"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">الأيقونة</label>
+                        <input
+                          type="text"
+                          value={sectionForm.icon}
+                          onChange={(e) => setSectionForm(prev => ({ ...prev, icon: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="مثال: ☕"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">رابط الصورة</label>
+                        <input
+                          type="text"
+                          value={sectionForm.image}
+                          onChange={(e) => setSectionForm(prev => ({ ...prev, image: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="رابط الصورة (اختياري)"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">ترتيب العرض</label>
+                        <input
+                          type="number"
+                          value={sectionForm.order_index}
+                          onChange={(e) => setSectionForm(prev => ({ ...prev, order_index: parseInt(e.target.value) || 0 }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 mt-6">
+                      <button
+                        onClick={handleSaveSection}
+                        className="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                        disabled={loading}
+                      >
+                        {loading ? 'جاري الحفظ...' : 'حفظ'}
+                      </button>
+                      <button
+                        onClick={resetForms}
+                        className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                      >
+                        إلغاء
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Items Tab */}
+          {activeTab === 'items' && (
+            <div>
+              <div className="flex justify-between items-center mb-6" dir="rtl">
+                <h3 className="text-xl font-bold">إدارة الأصناف</h3>
+                <button
+                  onClick={() => setShowAddItem(true)}
+                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  إضافة صنف جديد
+                </button>
+              </div>
+
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="text-gray-600 mt-2" dir="rtl">جاري تحميل الأصناف...</p>
+                </div>
+              ) : items.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500" dir="rtl">لا توجد أصناف حتى الآن</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {items.map((item) => (
+                    <div key={item.id} className="border rounded-lg p-4 bg-gray-50">
+                      <div className="flex justify-between items-start" dir="rtl">
+                        <div className="flex-1">
+                          <h4 className="font-bold text-gray-800">{item.name}</h4>
+                          <p className="text-gray-600">{item.description}</p>
+                          <p className="text-blue-600 font-semibold">{item.price} ر.س</p>
+                          {item.calories && <p className="text-gray-500 text-sm">{item.calories} كالوري</p>}
+                          <div className="flex gap-2 mt-2">
+                            {item.popular && <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">شائع</span>}
+                            {item.new && <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">جديد</span>}
+                            {!item.available && <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">غير متاح</span>}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingItem(item);
+                              setItemForm({
+                                section_id: item.section_id || '',
+                                name: item.name,
+                                description: item.description || '',
+                                price: item.price,
+                                calories: item.calories || 0,
+                                image: item.image || '',
+                                popular: item.popular || false,
+                                new: item.new || false,
+                                available: item.available !== false,
+                                order_index: item.order_index || 0
+                              });
+                              setItemSizes((item as any).sizes || []);
+                            }}
+                            className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteItem(item.id.toString())}
+                            className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Offers Tab */}
+          {activeTab === 'offers' && (
+            <div>
+              <div className="flex justify-between items-center mb-6" dir="rtl">
+                <h3 className="text-xl font-bold">إدارة العروض الخاصة</h3>
+                <button
+                  onClick={() => setShowAddOffer(true)}
+                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  إضافة عرض جديد
+                </button>
+              </div>
+
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="text-gray-600 mt-2" dir="rtl">جاري تحميل العروض...</p>
+                </div>
+              ) : offers.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500" dir="rtl">لا توجد عروض خاصة حتى الآن</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {offers.map((offer) => (
+                    <div key={offer.id} className="border rounded-lg p-4 bg-gray-50">
+                      <div className="flex justify-between items-start" dir="rtl">
+                        <div className="flex-1">
+                          <h4 className="font-bold text-gray-800">{offer.title}</h4>
+                          <p className="text-gray-600">{offer.description}</p>
+                          <div className="flex gap-4 mt-2">
+                            <p className="text-gray-500 line-through">{offer.original_price} ر.س</p>
+                            <p className="text-green-600 font-semibold">{offer.offer_price} ر.س</p>
+                          </div>
+                          <p className="text-blue-600 text-sm">ساري حتى: {offer.valid_until}</p>
+                          {!offer.active && <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">غير نشط</span>}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingOffer(offer);
+                              setOfferForm({
+                                title: offer.title,
+                                description: offer.description,
+                                originalPrice: offer.original_price,
+                                offerPrice: offer.offer_price,
+                                validUntil: offer.valid_until,
+                                image: offer.image || '',
+                                calories: offer.calories || 0,
+                                active: offer.active
+                              });
+                            }}
+                            className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteOffer(offer.id)}
+                            className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
