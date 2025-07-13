@@ -10,6 +10,8 @@ import AdminPanel from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
 import MenuActions from './components/MenuActions';
 import ReviewsSection from './components/ReviewsSection';
+import ReviewModal from './components/ReviewModal';
+import SocialMediaModal from './components/SocialMediaModal';
 import { useSupabaseMenu } from './hooks/useSupabaseMenu';
 import { useCart } from './hooks/useCart';
 import LoadingSpinner from './components/LoadingSpinner';
