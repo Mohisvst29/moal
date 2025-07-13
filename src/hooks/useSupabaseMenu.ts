@@ -151,6 +151,7 @@ export const useSupabaseMenu = () => {
       const { data, error } = await supabase
         .from('special_offers')
         .select('*')
+        .eq('active', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -168,7 +169,7 @@ export const useSupabaseMenu = () => {
   const getFormattedMenuSections = useMemo(() => {
     console.log(`🔄 Formatting menu sections - Supabase connected: ${isSupabaseConnected}, sections count: ${menuSections.length}`);
     
-    // استخدام البيانات الافتراضية دائماً لضمان عرض المنيو
+    // استخدام البيانات من Supabase إذا كانت متاحة، وإلا استخدم البيانات الافتراضية
     const sectionsToUse = isSupabaseConnected && menuSections.length > 0 ? menuSections : fallbackMenuSections.map(section => ({
       id: section.id.toString(),
       title: section.title,
@@ -241,7 +242,7 @@ export const useSupabaseMenu = () => {
   const getFormattedSpecialOffers = useMemo(() => {
     console.log(`🔄 Formatting special offers - Supabase connected: ${isSupabaseConnected}, offers count: ${specialOffers.length}`);
     
-    // استخدام البيانات الافتراضية دائماً لضمان عرض العروض
+    // استخدام البيانات من Supabase إذا كانت متاحة، وإلا استخدم البيانات الافتراضية
     const offersToUse = isSupabaseConnected && specialOffers.length > 0 ? specialOffers : fallbackSpecialOffers.map(offer => ({
       id: offer.id,
       title: offer.title,

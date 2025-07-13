@@ -4,10 +4,10 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import CategoryButtons from './components/CategoryButtons';
 import MenuSection from './components/MenuSection';
+import SpecialOffers from './components/SpecialOffers';
 import Cart from './components/Cart';
 import AdminPanel from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
-import VideoBackground from './components/VideoBackground';
 import MenuActions from './components/MenuActions';
 import ReviewsSection from './components/ReviewsSection';
 import { useSupabaseMenu } from './hooks/useSupabaseMenu';
@@ -61,11 +61,12 @@ function App() {
         description: offer.description,
         price: offer.offerPrice,
         image: offer.image,
-        popular: true, // جعل جميع العروض تظهر كـ "الأكثر طلباً"
-        new: true, // جعل جميع العروض تظهر كـ "جديد"
+        popular: true,
+        new: true,
         available: true,
-        originalPrice: offer.originalPrice, // إضافة السعر الأصلي
-        isOffer: true // علامة للتمييز أنه عرض خاص
+        originalPrice: offer.originalPrice,
+        isOffer: true,
+        calories: offer.calories
       }));
       
       sections.unshift({
@@ -78,7 +79,8 @@ function App() {
     
     return sections;
   }, [menuSections, specialOffers]);
-  const currentSection = allSections.find(section => section.id === activeSection);
+
+  const currentSection = allSections.find(section => section.id.toString() === activeSection);
 
   // دالة فتح لوحة التحكم
   const handleAdminClick = useCallback(() => {
@@ -210,7 +212,7 @@ function App() {
         {/* زر السلة */}
         <button
           onClick={() => setIsCartOpen(true)}
-          className="text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+          className="text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
           style={{ background: `linear-gradient(to right, #c4a484, #b8956f)` }}
         >
           <ShoppingCart className="w-5 h-5" />
@@ -224,7 +226,7 @@ function App() {
         {/* زر لوحة التحكم */}
         <button
           onClick={handleAdminClick}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
           title="لوحة التحكم"
         >
           <Settings className="w-5 h-5" />
@@ -247,6 +249,28 @@ function App() {
               </div>
             </div>
 
+            {/* Special Offers Section */}
+            {specialOffers && specialOffers.length > 0 && (
+              <SpecialOffers
+                offers={specialOffers}
+                onAddToCart={(offer) => {
+                  const offerAsItem = {
+                    id: `offer-${offer.id}`,
+                    name: offer.title,
+                    description: offer.description,
+                    price: offer.offerPrice,
+                    image: offer.image,
+                    popular: true,
+                    new: true,
+                    available: true,
+                    originalPrice: offer.originalPrice,
+                    isOffer: true,
+                    calories: offer.calories
+                  };
+                  addToCart(offerAsItem);
+                }}
+              />
+            )}
 
             {/* Category Buttons */}
             {allSections.length > 0 && (
@@ -332,7 +356,7 @@ function App() {
           onGoToMenu={() => {
             // الانتقال لأول قسم متاح
             if (allSections.length > 0) {
-              handleSectionChange(allSections[0].id);
+              handleSectionChange(allSections[0].id.toString());
             }
           }}
         />

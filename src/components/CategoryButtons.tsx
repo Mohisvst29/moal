@@ -30,13 +30,13 @@ const CategoryButtons: React.FC<CategoryButtonsProps> = memo(({ sections, active
       {sections.map((section) => (
         <button
           key={section.id}
-          onClick={() => onSectionChange(section.id)}
-          className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-            activeSection === section.id
+          onClick={() => onSectionChange(section.id.toString())}
+          className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+            activeSection === section.id.toString()
               ? 'text-white shadow-lg'
               : 'bg-white/90 backdrop-blur-md text-gray-700 hover:shadow-lg hover:scale-105 hover:bg-white/95'
           }`}
-          style={activeSection === section.id 
+          style={activeSection === section.id.toString()
             ? { background: `linear-gradient(to right, #d4a574, #c49660)`, borderColor: '#d4a574' }
             : { borderColor: '#d4a57450' }
           }

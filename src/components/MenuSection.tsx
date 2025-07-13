@@ -40,7 +40,8 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
       </div>
     );
   }
-  const handleSizeChange = (itemId: number, size: string) => {
+
+  const handleSizeChange = (itemId: string | number, size: string) => {
     const id = itemId.toString();
     setSelectedSizes(prev => ({ ...prev, [id]: size }));
   };
@@ -75,7 +76,7 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
         {availableItems.map((item) => (
           <div 
             key={item.id}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden menu-item-hover"
+            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden menu-item-hover"
             style={{ borderColor: '#87512f30' }}
           >
             {/* صورة المنتج */}
@@ -85,6 +86,8 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
                   src={item.image} 
                   alt={item.name}
                   className="w-full h-48 object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute top-2 right-2 flex gap-1">
                   {item.popular && (
@@ -124,7 +127,7 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
                   <label className="block text-sm font-medium text-gray-700 mb-2">الحجم:</label>
                   <select
                     value={selectedSizes[item.id.toString()] || item.sizes[0].size}
-                    onChange={(e) => handleSizeChange(item.id.toString(), e.target.value)}
+                    onChange={(e) => handleSizeChange(item.id, e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
                     style={{ '--tw-ring-color': '#87512f' } as React.CSSProperties}
                   >
@@ -159,7 +162,7 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
                 </div>
                 <button
                   onClick={() => handleAddToCart(item)}
-                  className="text-white px-4 py-2 rounded-lg transition-all duration-300 font-medium flex items-center gap-2 shadow-md hover:shadow-lg"
+                  className="text-white px-4 py-2 rounded-lg transition-all duration-200 font-medium flex items-center gap-2 shadow-md hover:shadow-lg"
                   style={{ 
                     background: `linear-gradient(to right, #d4a574, #c49660)`,
                     ':hover': { background: `linear-gradient(to right, #c49660, #b8864c)` }
