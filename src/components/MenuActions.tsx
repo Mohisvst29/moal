@@ -5,15 +5,26 @@ import SocialMediaModal from './SocialMediaModal';
 
 interface MenuActionsProps {
   onGoToMenu: () => void;
+  onGoToOffers: () => void;
 }
 
-const MenuActions: React.FC<MenuActionsProps> = ({ onGoToMenu }) => {
+const MenuActions: React.FC<MenuActionsProps> = ({ onGoToMenu, onGoToOffers }) => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showSocialModal, setShowSocialModal] = useState(false);
 
   return (
     <>
       <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
+        {/* زر العروض الخاصة */}
+        <button
+          onClick={onGoToOffers}
+          className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 font-semibold"
+          dir="rtl"
+        >
+          <span className="text-xl">🎁</span>
+          <span>العروض الخاصة</span>
+        </button>
+
         {/* زر اذهب للمنيو الآن */}
         <button
           onClick={onGoToMenu}

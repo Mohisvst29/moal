@@ -340,9 +340,14 @@ function App() {
         <MenuActions
           onGoToMenu={() => {
             // الانتقال لأول قسم متاح
-            if (allSections.length > 0) {
-              handleSectionChange(allSections[0].id.toString());
+            const regularSections = allSections.filter(section => section.id !== 'special-offers');
+            if (regularSections.length > 0) {
+              handleSectionChange(regularSections[0].id.toString());
             }
+          }}
+          onGoToOffers={() => {
+            // الانتقال لقسم العروض الخاصة
+            handleSectionChange('special-offers');
           }}
         />
       )}
