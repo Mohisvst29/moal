@@ -167,7 +167,7 @@ export const useSupabaseMenu = () => {
       setSpecialOffers(data || []);
       return data || [];
     } catch (err) {
-      console.warn('⚠️ Error fetching special offers, using fallback data:', err);
+      console.warn('⚠️ Error fetching special offers:', err);
       // لا نرمي الخطأ، بل نستخدم البيانات الافتراضية
       setSpecialOffers([]);
       return [];

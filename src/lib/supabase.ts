@@ -5,8 +5,8 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // إنشاء عميل Supabase مع معالجة الأخطاء
-let supabase: any = null;
-let isSupabaseAvailable = false;
+export let supabase: any = null;
+export let isSupabaseAvailable = false;
 
 try {
   if (supabaseUrl && supabaseAnonKey && 
@@ -30,19 +30,19 @@ if (!supabase) {
   isSupabaseAvailable = false;
   supabase = {
     from: (table: string) => ({
-      select: (columns?: string) => ({
+      select: (columns?: string) => Promise.resolve({
         data: [], 
         error: new Error(`Supabase not configured - attempted to select from ${table}`) 
       }),
-      insert: (data: any) => ({
+      insert: (data: any) => Promise.resolve({
         data: [], 
         error: new Error(`Supabase not configured - attempted to insert into ${table}`) 
       }),
-      update: (data: any) => ({
+      update: (data: any) => Promise.resolve({
         data: [], 
         error: new Error(`Supabase not configured - attempted to update ${table}`) 
       }),
-      delete: () => ({
+      delete: () => Promise.resolve({
         data: [], 
         error: new Error(`Supabase not configured - attempted to delete from ${table}`) 
       }),
