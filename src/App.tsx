@@ -128,27 +128,6 @@ function App() {
     );
   }
 
-  // التأكد من وجود البيانات
-  if (!loading && menuSections.length === 0 && specialOffers.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 font-['Tajawal'] flex items-center justify-center">
-        <div className="text-center bg-white/90 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-red-200/50 m-4">
-          <h2 className="text-2xl font-bold text-red-800 mb-4" dir="rtl">خطأ في تحميل البيانات</h2>
-          <p className="text-red-600 mb-4" dir="rtl">
-            جاري تحميل البيانات... يرجى الانتظار
-          </p>
-          <button
-            onClick={refreshData}
-            className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors"
-            dir="rtl"
-          >
-            إعادة المحاولة
-          </button>
-        </div>
-      </div>
-    );
-  }
-  
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 font-['Tajawal']">
       {/* Video Background */}
