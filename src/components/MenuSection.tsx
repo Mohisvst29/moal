@@ -11,6 +11,19 @@ interface MenuSectionProps {
 
 const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAddToCart }) => {
   const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
+  
+  // تحسين الأداء بحفظ العناصر المفلترة
+  const availableItems = useMemo(() => {
+    return items?.filter(item => item.available !== false) || [];
+  }, [items]);
+
+  // تحسين الأداء بتأخير تحميل الصور
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setImagesLoaded(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   console.log('MenuSection received:', { 
     title, 
@@ -58,19 +71,6 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
       onAddToCart(item);
     }
   };
-
-  // تحسين الأداء بحفظ العناصر المفلترة
-  const availableItems = useMemo(() => {
-    return items.filter(item => item.available !== false);
-  }, [items]);
-
-  // تحسين الأداء بتأخير تحميل الصور
-  const [imagesLoaded, setImagesLoaded] = useState(false);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => setImagesLoaded(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <div className="mb-8">
