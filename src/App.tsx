@@ -20,6 +20,8 @@ function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showSocialModal, setShowSocialModal] = useState(false);
   
   const { 
     menuSections, 
@@ -236,7 +238,7 @@ function App() {
       <main className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         {activeSection === 'home' ? (
           <>
-            {/* Welcome Message */}
+            {/* رسالة الترحيب */}
             <div className="text-center mb-12">
               <div className="bg-white/90 backdrop-blur-md rounded-2xl p-8 shadow-2xl border" style={{ borderColor: '#87512f50' }}>
                 <h2 className="text-3xl font-bold mb-4" dir="rtl" style={{ color: '#87512f' }}>
@@ -249,33 +251,80 @@ function App() {
               </div>
             </div>
 
-            {/* Special Offers Section */}
-            {specialOffers && specialOffers.length > 0 && (
-              <SpecialOffers
-                offers={specialOffers}
-                onAddToCart={addToCart}
-              />
-            )}
+            {/* الأزرار الرئيسية */}
+            <div className="text-center mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                {/* زر العروض الخاصة */}
+                <button
+                  onClick={() => handleSectionChange('special-offers')}
+                  className="bg-gradient-to-r from-red-500 to-red-600 text-white py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold text-lg"
+                  dir="rtl"
+                >
+                  <span className="text-2xl">🎁</span>
+                  <span>العروض الخاصة</span>
+                </button>
 
-            {/* Category Buttons */}
-            {allSections.length > 0 && (
-              <div className="text-center mb-8">
-                <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border mb-6" style={{ borderColor: '#87512f50' }}>
-                  <h2 className="text-2xl font-bold mb-4" dir="rtl" style={{ color: '#87512f' }}>
-                    اختر من قائمة الطعام ({allSections.length} أقسام متاحة)
-                  </h2>
-                </div>
-                <CategoryButtons
-                  sections={allSections}
-                  activeSection={activeSection}
-                  onSectionChange={handleSectionChange}
-                />
+                {/* زر اذهب للمنيو الآن */}
+                <button
+                  onClick={() => {
+                    const regularSections = menuSections.filter(section => section.id !== 'special-offers');
+                    if (regularSections.length > 0) {
+                      handleSectionChange(regularSections[0].id.toString());
+                    }
+                  }}
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold text-lg"
+                  dir="rtl"
+                >
+                  <span className="text-2xl">🍽️</span>
+                  <span>اذهب للمنيو الآن</span>
+                </button>
+
+                {/* زر تابعنا على السوشيال ميديا */}
+                <button
+                  onClick={() => setShowSocialModal(true)}
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold text-lg"
+                  dir="rtl"
+                >
+                  <span className="text-2xl">📱</span>
+                  <span>تابعنا على السوشيال ميديا</span>
+                </button>
+
+                {/* زر اكتب رأيك الآن */}
+                <button
+                  onClick={() => setShowReviewModal(true)}
+                  className="bg-gradient-to-r from-green-500 to-green-600 text-white py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold text-lg"
+                  dir="rtl"
+                >
+                  <span className="text-2xl">⭐</span>
+                  <span>اكتب رأيك الآن</span>
+                </button>
               </div>
-            )}
+            </div>
 
             {/* Reviews Section */}
             <ReviewsSection />
           </>
+        ) : activeSection === 'special-offers' ? (
+          <div>
+            {/* Back Button */}
+            <div className="mb-6">
+              <button
+                onClick={() => handleSectionChange('home')}
+                className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
+                style={{ color: '#87512f' }}
+                dir="rtl"
+              >
+                <ArrowRight className="w-5 h-5" />
+                <span>العودة للرئيسية</span>
+              </button>
+            </div>
+
+            {/* Special Offers Section */}
+            <SpecialOffers
+              offers={specialOffers}
+              onAddToCart={addToCart}
+            />
+          </div>
         ) : (
           <div>
             {/* Back Button */}
@@ -333,24 +382,20 @@ function App() {
         )}
       </main>
 
-      <Footer />
+      {/* إضافة المتغيرات المطلوبة */}
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+      />
 
-      {/* Menu Actions - الأزرار الجديدة */}
-      {activeSection === 'home' && (
-        <MenuActions
-          onGoToMenu={() => {
-            // الانتقال لأول قسم متاح
-            const regularSections = allSections.filter(section => section.id !== 'special-offers');
-            if (regularSections.length > 0) {
-              handleSectionChange(regularSections[0].id.toString());
-            }
-          }}
-          onGoToOffers={() => {
-            // الانتقال لقسم العروض الخاصة
-            handleSectionChange('special-offers');
-          }}
-        />
-      )}
+      {/* Social Media Modal */}
+      <SocialMediaModal
+        isOpen={showSocialModal}
+        onClose={() => setShowSocialModal(false)}
+      />
+
+      <Footer />
 
       {/* Cart */}
       <div className="relative z-50">

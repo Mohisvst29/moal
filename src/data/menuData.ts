@@ -234,7 +234,8 @@ export const specialOffers: SpecialOffer[] = [
     originalPrice: 43,
     offerPrice: 35,
     validUntil: '31 ديسمبر 2024',
-    calories: 355
+    calories: 355,
+    image: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=400'
   },
   {
     id: 'offer-2',
@@ -243,6 +244,7 @@ export const specialOffers: SpecialOffer[] = [
     originalPrice: 54,
     offerPrice: 45,
     validUntil: '31 ديسمبر 2024',
-    calories: 585
+    calories: 585,
+    image: 'https://images.pexels.com/photos/230325/pexels-photo-230325.jpeg?auto=compress&cs=tinysrgb&w=400'
   }
 ];
