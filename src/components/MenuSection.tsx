@@ -1,4 +1,4 @@
-import React, { useState, memo, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { MenuItem } from '../types/menu';
 
@@ -9,7 +9,7 @@ interface MenuSectionProps {
   onAddToCart: (item: MenuItem, selectedSize?: string, selectedPrice?: number) => void;
 }
 
-const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAddToCart }) => {
+const MenuSection: React.FC<MenuSectionProps> = ({ title, items, icon, onAddToCart }) => {
   const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
 
   console.log('MenuSection received:', { 
@@ -58,11 +58,6 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
     }
   };
 
-  // تحسين الأداء بحفظ العناصر المفلترة
-  const availableItems = useMemo(() => {
-    return items.filter(item => item.available !== false);
-  }, [items]);
-
   return (
     <div className="mb-8">
       <div className="flex items-center justify-center gap-3 mb-6">
@@ -72,7 +67,7 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
       </div>
       
       <div className="menu-grid grid gap-4 lg:gap-6">
-        {availableItems.map((item) => (
+        {items.map((item) => (
           <div 
             key={item.id}
             className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden menu-item-hover"
@@ -175,8 +170,6 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
       </div>
     </div>
   );
-});
-
-MenuSection.displayName = 'MenuSection';
+};
 
 export default MenuSection;

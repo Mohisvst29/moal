@@ -1,10 +1,10 @@
-import React, { memo } from 'react';
+import React from 'react';
 
 interface LoadingSpinnerProps {
   message?: string;
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = memo(({ message = 'جاري التحميل...' }) => {
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ message = 'جاري التحميل...' }) => {
   return (
     <div className="flex items-center justify-center p-8">
       <div className="text-center">
@@ -13,8 +13,6 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = memo(({ message = 'جار�
       </div>
     </div>
   );
-});
-
-LoadingSpinner.displayName = 'LoadingSpinner';
+};
 
 export default LoadingSpinner;

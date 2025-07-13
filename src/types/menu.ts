@@ -42,14 +42,4 @@ export interface SpecialOffer {
   calories?: number;
   created_at?: string;
   updated_at?: string;
-
-export interface Review {
-  id: string;
-  customer_name: string;
-  rating: number;
-  comment: string;
-  approved: boolean;
-  created_at: string;
-  updated_at: string;
-}
 }

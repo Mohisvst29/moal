@@ -4,10 +4,6 @@
 
 body {
   font-family: 'Tajawal', sans-serif;
-  /* تحسين الأداء */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeSpeed;
 }
 
 /* تحسين النصوص العربية */
@@ -17,13 +13,11 @@ body {
 
 /* تأثيرات مخصصة */
 .menu-item-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  will-change: transform;
+  transition: all 0.3s ease;
 }
 
 .menu-item-hover:hover {
   transform: translateY(-2px);
-  transform: translate3d(0, -2px, 0);
 }
 
 /* تدرجات مخصصة */
@@ -39,9 +33,6 @@ body {
   aspect-ratio: 16/9;
   object-fit: cover;
   border-radius: 0.75rem;
-  /* تحسين تحميل الصور */
-  loading: lazy;
-  decoding: async;
 }
 
 /* تحسينات للوحة التحكم */
@@ -90,24 +81,22 @@ body {
 
 /* تأثيرات الفيديو */
 .video-hover-effect {
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .video-hover-effect:hover {
-  transform: translate3d(0, -4px, 0);
+  transform: translateY(-4px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 /* تحسينات للأزرار */
 .video-control-btn {
   backdrop-filter: blur(8px);
-  transition: transform 0.15s ease;
-  will-change: transform;
+  transition: all 0.2s ease;
 }
 
 .video-control-btn:hover {
-  transform: scale3d(1.1, 1.1, 1);
+  transform: scale(1.1);
 }
 
 /* تحسينات للشفافية والخلفية */
@@ -147,35 +136,4 @@ body {
   .category-grid {
     grid-template-columns: repeat(4, 1fr);
   }
-}
-
-/* تحسينات الأداء العامة */
-* {
-  box-sizing: border-box;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* تحسين الانتقالات */
-.transition-all {
-  transition-property: transform, opacity, box-shadow;
-  transition-duration: 0.2s;
-  transition-timing-function: ease;
-}
-
-/* تحسين الشبكة */
-.menu-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-
-.category-grid {
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { menuSections as fallbackMenuSections, specialOffers as fallbackSpecialOffers } from '../data/menuData';
 
@@ -59,7 +58,6 @@ export const useSupabaseMenu = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSupabaseConnected, setIsSupabaseConnected] = useState(false);
-  const [dataLoaded, setDataLoaded] = useState(false);
 
   // التحقق من اتصال Supabase
   const checkSupabaseConnection = async () => {
@@ -165,7 +163,7 @@ export const useSupabaseMenu = () => {
   };
 
   // تحويل البيانات لتتوافق مع الواجهة الحالية
-  const getFormattedMenuSections = useMemo(() => {
+  const getFormattedMenuSections = () => {
     console.log(`🔄 Formatting menu sections - Supabase connected: ${isSupabaseConnected}, sections count: ${menuSections.length}`);
     
     // استخدام البيانات الافتراضية دائماً لضمان عرض المنيو
@@ -236,9 +234,9 @@ export const useSupabaseMenu = () => {
         items: sectionItems
       };
     });
-  }, [menuSections, menuItems, isSupabaseConnected]);
+  };
 
-  const getFormattedSpecialOffers = useMemo(() => {
+  const getFormattedSpecialOffers = () => {
     console.log(`🔄 Formatting special offers - Supabase connected: ${isSupabaseConnected}, offers count: ${specialOffers.length}`);
     
     // استخدام البيانات الافتراضية دائماً لضمان عرض العروض
@@ -268,12 +266,9 @@ export const useSupabaseMenu = () => {
         image: offer.image,
         calories: offer.calories
       }));
-  }, [specialOffers, isSupabaseConnected]);
+  };
 
   useEffect(() => {
-    // تجنب إعادة التحميل إذا كانت البيانات محملة بالفعل
-    if (dataLoaded) return;
-    
     const loadData = async () => {
       setLoading(true);
       setError(null);
@@ -304,18 +299,17 @@ export const useSupabaseMenu = () => {
         setError('تم تحميل البيانات الافتراضية بنجاح');
         setIsSupabaseConnected(false);
       } finally {
-        setDataLoaded(true);
         setLoading(false);
         console.log('🏁 Data loading completed');
       }
     };
 
     loadData();
-  }, [dataLoaded]);
+  }, []);
 
   // التأكد من إرجاع البيانات دائماً
-  const finalMenuSections = getFormattedMenuSections;
-  const finalSpecialOffers = getFormattedSpecialOffers;
+  const finalMenuSections = getFormattedMenuSections();
+  const finalSpecialOffers = getFormattedSpecialOffers();
 
   console.log('Final data check:', {
     menuSectionsCount: finalMenuSections.length,
@@ -333,13 +327,10 @@ export const useSupabaseMenu = () => {
     refreshData: async () => {
       if (isSupabaseConnected) {
         console.log('🔄 Refreshing data...');
-        setDataLoaded(false);
         try {
           await Promise.all([fetchMenuSections(), fetchMenuItems(), fetchSpecialOffers()]);
-          setDataLoaded(true);
         } catch (err) {
           console.error('❌ Error refreshing data:', err);
-          setDataLoaded(true);
         }
       }
     }

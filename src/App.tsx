@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState } from 'react';
 import { ShoppingCart, ArrowRight, Settings } from 'lucide-react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -8,8 +8,6 @@ import Cart from './components/Cart';
 import AdminPanel from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
 import VideoBackground from './components/VideoBackground';
-import MenuActions from './components/MenuActions';
-import ReviewsSection from './components/ReviewsSection';
 import { useSupabaseMenu } from './hooks/useSupabaseMenu';
 import { useCart } from './hooks/useCart';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -50,7 +48,7 @@ function App() {
   ];
 
   // دمج العروض الخاصة مع أقسام المنيو
-  const allSections = useMemo(() => {
+  const allSections = React.useMemo(() => {
     const sections = [...menuSections];
     
     // إضافة قسم العروض الخاصة إذا كانت موجودة
@@ -81,25 +79,20 @@ function App() {
   const currentSection = allSections.find(section => section.id === activeSection);
 
   // دالة فتح لوحة التحكم
-  const handleAdminClick = useCallback(() => {
+  const handleAdminClick = () => {
     if (isAdminLoggedIn) {
       setIsAdminOpen(true);
     } else {
       setShowLoginModal(true);
     }
-  }, [isAdminLoggedIn]);
+  };
 
   // دالة تسجيل الدخول للأدمن
-  const handleAdminLogin = useCallback(() => {
+  const handleAdminLogin = () => {
     setIsAdminLoggedIn(true);
     setShowLoginModal(false);
     setIsAdminOpen(true);
-  }, []);
-
-  // تحسين دالة تغيير القسم
-  const handleSectionChange = useCallback((sectionId: string) => {
-    setActiveSection(sectionId);
-  }, []);
+  }
 
   // إضافة console.log لتتبع البيانات
   console.log('App State:', {
@@ -259,20 +252,17 @@ function App() {
                 <CategoryButtons
                   sections={allSections}
                   activeSection={activeSection}
-                  onSectionChange={handleSectionChange}
+                  onSectionChange={setActiveSection}
                 />
               </div>
             )}
-
-            {/* Reviews Section */}
-            <ReviewsSection />
           </>
         ) : (
           <div>
             {/* Back Button */}
             <div className="mb-6">
               <button
-                onClick={() => handleSectionChange('home')}
+                onClick={() => setActiveSection('home')}
                 className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
                 style={{ color: '#87512f' }}
                 dir="rtl"
@@ -303,7 +293,7 @@ function App() {
                     لم يتم العثور على هذا القسم في المنيو. الأقسام المتاحة: {allSections.length}
                   </p>
                   <button
-                    onClick={() => handleSectionChange('home')}
+                    onClick={() => setActiveSection('home')}
                     className="text-white px-6 py-2 rounded-lg transition-colors"
                     style={{ backgroundColor: '#87512f' }}
                     dir="rtl"
@@ -325,18 +315,6 @@ function App() {
       </main>
 
       <Footer />
-
-      {/* Menu Actions - الأزرار الجديدة */}
-      {activeSection === 'home' && (
-        <MenuActions
-          onGoToMenu={() => {
-            // الانتقال لأول قسم متاح
-            if (allSections.length > 0) {
-              handleSectionChange(allSections[0].id);
-            }
-          }}
-        />
-      )}
 
       {/* Cart */}
       <div className="relative z-50">
