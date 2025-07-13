@@ -164,13 +164,13 @@ function App() {
       
       <Header />
       
-      {/* تنبيه حالة قاعدة البيانات */}
+      {/* تنبيه الأخطاء */}
       {error && (
-        <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 relative z-30">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 relative z-30">
           <div className="flex">
             <div className="ml-3">
               <p className="text-sm" dir="rtl">
-                ✅ تم تحميل البيانات بنجاح - المنيو جاهز للاستخدام
+                ⚠️ {error}
               </p>
             </div>
           </div>
@@ -178,7 +178,7 @@ function App() {
       )}
 
       {/* تنبيه نجاح الاتصال */}
-      {isSupabaseConnected && (
+      {isSupabaseConnected && !error && (
         <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 relative z-30">
           <div className="flex">
             <div className="ml-3">

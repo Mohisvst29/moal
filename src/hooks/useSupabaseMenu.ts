@@ -334,15 +334,16 @@ export const useSupabaseMenu = () => {
             console.log('✅ All data loaded successfully from Supabase');
           } catch (supabaseError) {
             console.warn('⚠️ Supabase data loading failed, using fallback data:', supabaseError);
-            setError('تم تحميل البيانات الافتراضية بنجاح');
+            setError('فشل في تحميل البيانات من الخادم، تم استخدام البيانات المحلية');
+            setIsSupabaseConnected(false);
           }
         } else {
           console.log('⚠️ Supabase not connected, using fallback data');
-          setError('تم تحميل البيانات الافتراضية بنجاح');
+          setError('لا يمكن الاتصال بقاعدة البيانات، تم استخدام البيانات المحلية');
         }
       } catch (err) {
         console.error('❌ Failed to load data:', err);
-        setError('تم تحميل البيانات الافتراضية بنجاح');
+        setError('حدث خطأ في تحميل البيانات، تم استخدام البيانات المحلية');
         setIsSupabaseConnected(false);
       } finally {
         setDataLoaded(true);
