@@ -18,6 +18,7 @@ import LoadingSpinner from './components/LoadingSpinner';
 
 function App() {
   const [activeSection, setActiveSection] = useState<string>('home');
+  const [navigationHistory, setNavigationHistory] = useState<string[]>(['home']);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -116,7 +117,25 @@ function App() {
 
   // تحسين دالة تغيير القسم
   const handleSectionChange = useCallback((sectionId: string) => {
+    setNavigationHistory(prev => [...prev, sectionId]);
     setActiveSection(sectionId);
+  }, []);
+
+  // دالة العودة للصفحة السابقة
+  const handleGoBack = useCallback(() => {
+    if (navigationHistory.length > 1) {
+      const newHistory = [...navigationHistory];
+      newHistory.pop(); // إزالة الصفحة الحالية
+      const previousPage = newHistory[newHistory.length - 1];
+      setNavigationHistory(newHistory);
+      setActiveSection(previousPage);
+    }
+  }, [navigationHistory]);
+
+  // دالة العودة للصفحة الرئيسية
+  const handleGoHome = useCallback(() => {
+    setNavigationHistory(['home']);
+    setActiveSection('home');
   }, []);
 
   // إضافة console.log لتتبع البيانات
@@ -286,15 +305,28 @@ function App() {
           <div>
             {/* Back Button */}
             <div className="mb-6">
-              <button
-                onClick={() => handleSectionChange('home')}
-                className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
-                style={{ color: '#87512f' }}
-                dir="rtl"
-              >
-                <ArrowRight className="w-5 h-5" />
-                <span>العودة للرئيسية</span>
-              </button>
+              <div className="flex gap-3">
+                {navigationHistory.length > 1 && (
+                  <button
+                    onClick={handleGoBack}
+                    className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
+                    style={{ color: '#87512f' }}
+                    dir="rtl"
+                  >
+                    <ArrowRight className="w-5 h-5" />
+                    <span>السابق</span>
+                  </button>
+                )}
+                <button
+                  onClick={handleGoHome}
+                  className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
+                  style={{ color: '#87512f' }}
+                  dir="rtl"
+                >
+                  <span>🏠</span>
+                  <span>الرئيسية</span>
+                </button>
+              </div>
             </div>
 
             {/* Category Selection */}
@@ -320,15 +352,28 @@ function App() {
           <div>
             {/* Back Button */}
             <div className="mb-6">
-              <button
-                onClick={() => handleSectionChange('home')}
-                className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
-                style={{ color: '#87512f' }}
-                dir="rtl"
-              >
-                <ArrowRight className="w-5 h-5" />
-                <span>العودة للرئيسية</span>
-              </button>
+              <div className="flex gap-3">
+                {navigationHistory.length > 1 && (
+                  <button
+                    onClick={handleGoBack}
+                    className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
+                    style={{ color: '#87512f' }}
+                    dir="rtl"
+                  >
+                    <ArrowRight className="w-5 h-5" />
+                    <span>السابق</span>
+                  </button>
+                )}
+                <button
+                  onClick={handleGoHome}
+                  className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
+                  style={{ color: '#87512f' }}
+                  dir="rtl"
+                >
+                  <span>🏠</span>
+                  <span>الرئيسية</span>
+                </button>
+              </div>
             </div>
 
             {/* Special Offers Section */}
@@ -341,15 +386,28 @@ function App() {
           <div>
             {/* Back Button */}
             <div className="mb-6">
-              <button
-                onClick={() => handleSectionChange('home')}
-                className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
-                style={{ color: '#87512f' }}
-                dir="rtl"
-              >
-                <ArrowRight className="w-5 h-5" />
-                <span>العودة للرئيسية</span>
-              </button>
+              <div className="flex gap-3">
+                {navigationHistory.length > 1 && (
+                  <button
+                    onClick={handleGoBack}
+                    className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
+                    style={{ color: '#87512f' }}
+                    dir="rtl"
+                  >
+                    <ArrowRight className="w-5 h-5" />
+                    <span>السابق</span>
+                  </button>
+                )}
+                <button
+                  onClick={handleGoHome}
+                  className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
+                  style={{ color: '#87512f' }}
+                  dir="rtl"
+                >
+                  <span>🏠</span>
+                  <span>الرئيسية</span>
+                </button>
+              </div>
             </div>
 
             {/* Current Section */}
@@ -373,12 +431,12 @@ function App() {
                     لم يتم العثور على هذا القسم في المنيو. الأقسام المتاحة: {allSections.length}
                   </p>
                   <button
-                    onClick={() => handleSectionChange('home')}
+                    onClick={handleGoHome}
                     className="text-white px-6 py-2 rounded-lg transition-colors"
                     style={{ backgroundColor: '#87512f' }}
                     dir="rtl"
                   >
-                    العودة للرئيسية
+                    الرئيسية
                   </button>
                 </div>
                 <div className="mt-4 text-xs text-gray-500" dir="rtl">
