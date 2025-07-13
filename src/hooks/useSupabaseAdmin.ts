@@ -602,6 +602,32 @@ export const useSupabaseAdmin = () => {
     }
   };
 
+  return {
+    sections,
+    items,
+    offers,
+    loading,
+    error,
+    fetchData,
+    setError: setErrorMessage,
+    // Section operations
+    addSection,
+    updateSection,
+    deleteSection,
+    // Menu item operations
+    addItem: addMenuItem,
+    updateItem: updateMenuItem,
+    deleteItem: deleteMenuItem,
+    // Special offer operations
+    addOffer: addSpecialOffer,
+    updateOffer: updateSpecialOffer,
+    deleteOffer: deleteSpecialOffer,
+    // Image operations
+    uploadImage,
+    convertImageToBase64,
+    validateImageUrl
+  };
+
   // Review operations
   const fetchReviews = async () => {
     try {

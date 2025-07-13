@@ -15,7 +15,7 @@ const Header: React.FC = () => {
             مقهى موال مراكش
           </h1>
           <p className="text-lg" dir="rtl" style={{ color: '#b8956f' }}>
-            تجربة قهوة أصيلة بنكهة مغربية وأجواء رائعة
+            تجربة قهوة أصيلة بنكهة مغربية
           </p>
         </div>
         

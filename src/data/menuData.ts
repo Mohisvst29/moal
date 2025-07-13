@@ -228,23 +228,30 @@ export const menuSections: MenuSection[] = [
 
 export const specialOffers: SpecialOffer[] = [
   {
-    id: 'offer-mwal-marrakech',
-    title: 'عرض موال مراكش',
-    description: 'معسل + حلا + مشروب (حار)',
-    originalPrice: 76,
-    offerPrice: 69,
-    validUntil: '30 يوليو 2025',
-    calories: 0,
-    image: 'https://images.pexels.com/photos/96974/pexels-photo-96974.jpeg?auto=compress&cs=tinysrgb&w=400'
+    id: 'offer-1',
+    title: 'عرض الإفطار المميز',
+    description: 'قهوة + كرواسون + عصير طازج',
+    originalPrice: 43,
+    offerPrice: 35,
+    validUntil: '31 ديسمبر 2024',
+    calories: 355
   },
   {
-    id: 'offer-breakfast-on-clifford',
-    title: 'عرض فطورك على كليفورد',
-    description: 'اختارين - كرواسان - قاهيتا - حلومي - أريج لحمان، مشروب من اختيارك قهوة اليوم - كابسة شاي - مشروب غازي معسل من اختيارك',
-    originalPrice: 60,
-    offerPrice: 49,
-    validUntil: '30 يوليو 2025',
-    calories: 0,
-    image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400'
+    id: 'offer-2',
+    title: 'عرض المساء الخاص',
+    description: 'شاي أتاي + كيك نوتيلا + كوكيز',
+    originalPrice: 54,
+    offerPrice: 45,
+    validUntil: '31 ديسمبر 2024',
+    calories: 585
+  },
+  {
+    id: 'offer-3',
+    title: 'عرض البيتزا العائلي',
+    description: 'بيتزا كبيرة + مشروبين غازي',
+    originalPrice: 44,
+    offerPrice: 35,
+    validUntil: '31 ديسمبر 2024',
+    calories: 630
   }
 ];

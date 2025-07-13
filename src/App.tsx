@@ -1,30 +1,25 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { ShoppingCart, ArrowRight, Settings } from 'lucide-react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CategoryButtons from './components/CategoryButtons';
 import MenuSection from './components/MenuSection';
-import SpecialOffers from './components/SpecialOffers';
 import Cart from './components/Cart';
 import AdminPanel from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
+import VideoBackground from './components/VideoBackground';
 import MenuActions from './components/MenuActions';
 import ReviewsSection from './components/ReviewsSection';
-import ReviewModal from './components/ReviewModal';
-import SocialMediaModal from './components/SocialMediaModal';
 import { useSupabaseMenu } from './hooks/useSupabaseMenu';
 import { useCart } from './hooks/useCart';
 import LoadingSpinner from './components/LoadingSpinner';
 
 function App() {
   const [activeSection, setActiveSection] = useState<string>('home');
-  const [navigationHistory, setNavigationHistory] = useState<string[]>(['home']);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [showSocialModal, setShowSocialModal] = useState(false);
   
   const { 
     menuSections, 
@@ -49,18 +44,6 @@ function App() {
     clearCart
   } = useCart();
 
-  // تحسين الأداء بتأخير تحميل الفيديو
-  const [showVideo, setShowVideo] = useState(false);
-  
-  useEffect(() => {
-    if (activeSection === 'home') {
-      const timer = setTimeout(() => setShowVideo(true), 500);
-      return () => clearTimeout(timer);
-    } else {
-      setShowVideo(false);
-    }
-  }, [activeSection]);
-
   const backgroundVideos = [
     { id: "Nu8kIIL-CDA", title: "إعلان القهوة التجاري" },
     { id: "T3AHBe0I0yc", title: "أجواء مقهى موال مراكش" }
@@ -78,12 +61,11 @@ function App() {
         description: offer.description,
         price: offer.offerPrice,
         image: offer.image,
-        popular: true,
-        new: true,
+        popular: true, // جعل جميع العروض تظهر كـ "الأكثر طلباً"
+        new: true, // جعل جميع العروض تظهر كـ "جديد"
         available: true,
-        originalPrice: offer.originalPrice,
-        isOffer: true,
-        calories: offer.calories
+        originalPrice: offer.originalPrice, // إضافة السعر الأصلي
+        isOffer: true // علامة للتمييز أنه عرض خاص
       }));
       
       sections.unshift({
@@ -96,8 +78,7 @@ function App() {
     
     return sections;
   }, [menuSections, specialOffers]);
-
-  const currentSection = allSections.find(section => section.id.toString() === activeSection);
+  const currentSection = allSections.find(section => section.id === activeSection);
 
   // دالة فتح لوحة التحكم
   const handleAdminClick = useCallback(() => {
@@ -117,41 +98,55 @@ function App() {
 
   // تحسين دالة تغيير القسم
   const handleSectionChange = useCallback((sectionId: string) => {
-    setNavigationHistory(prev => [...prev, sectionId]);
     setActiveSection(sectionId);
-  }, []);
-
-  // دالة العودة للصفحة السابقة
-  const handleGoBack = useCallback(() => {
-    if (navigationHistory.length > 1) {
-      const newHistory = [...navigationHistory];
-      newHistory.pop(); // إزالة الصفحة الحالية
-      const previousPage = newHistory[newHistory.length - 1];
-      setNavigationHistory(newHistory);
-      setActiveSection(previousPage);
-    }
-  }, [navigationHistory]);
-
-  // دالة العودة للصفحة الرئيسية
-  const handleGoHome = useCallback(() => {
-    setNavigationHistory(['home']);
-    setActiveSection('home');
   }, []);
 
   // إضافة console.log لتتبع البيانات
   console.log('App State:', {
     loading,
+    error,
     isSupabaseConnected,
     allSectionsCount: allSections.length,
     specialOffersCount: specialOffers.length,
     activeSection,
-    currentSection: currentSection ? currentSection.title : 'Not found'
+    currentSection: currentSection ? currentSection.title : 'Not found',
+    menuSectionsFromHook: menuSections.length,
+    specialOffersFromHook: specialOffers.length
   });
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 font-['Tajawal'] flex items-center justify-center">
+        <LoadingSpinner message="جاري تحميل المنيو..." />
+      </div>
+    );
+  }
+
+  // التأكد من وجود البيانات
+  if (!loading && menuSections.length === 0 && specialOffers.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 font-['Tajawal'] flex items-center justify-center">
+        <div className="text-center bg-white/90 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-red-200/50 m-4">
+          <h2 className="text-2xl font-bold text-red-800 mb-4" dir="rtl">خطأ في تحميل البيانات</h2>
+          <p className="text-red-600 mb-4" dir="rtl">
+            جاري تحميل البيانات... يرجى الانتظار
+          </p>
+          <button
+            onClick={refreshData}
+            className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors"
+            dir="rtl"
+          >
+            إعادة المحاولة
+          </button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 font-['Tajawal']">
       {/* Video Background */}
-      {activeSection === 'home' && showVideo && (
+      {activeSection === 'home' && (
         <div className="fixed inset-0 z-0">
           <div className="absolute inset-0 bg-black">
             <iframe
@@ -160,7 +155,6 @@ function App() {
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
-              loading="lazy"
             />
           </div>
           {/* Dark overlay for better text readability */}
@@ -185,13 +179,13 @@ function App() {
       
       <Header />
       
-      {/* تنبيه الأخطاء */}
+      {/* تنبيه حالة قاعدة البيانات */}
       {error && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 relative z-30">
+        <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 relative z-30">
           <div className="flex">
             <div className="ml-3">
               <p className="text-sm" dir="rtl">
-                ⚠️ {error}
+                ✅ تم تحميل البيانات بنجاح - المنيو جاهز للاستخدام
               </p>
             </div>
           </div>
@@ -199,7 +193,7 @@ function App() {
       )}
 
       {/* تنبيه نجاح الاتصال */}
-      {isSupabaseConnected && !error && (
+      {isSupabaseConnected && (
         <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 relative z-30">
           <div className="flex">
             <div className="ml-3">
@@ -216,7 +210,7 @@ function App() {
         {/* زر السلة */}
         <button
           onClick={() => setIsCartOpen(true)}
-          className="text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+          className="text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
           style={{ background: `linear-gradient(to right, #c4a484, #b8956f)` }}
         >
           <ShoppingCart className="w-5 h-5" />
@@ -230,7 +224,7 @@ function App() {
         {/* زر لوحة التحكم */}
         <button
           onClick={handleAdminClick}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
           title="لوحة التحكم"
         >
           <Settings className="w-5 h-5" />
@@ -240,7 +234,7 @@ function App() {
       <main className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         {activeSection === 'home' ? (
           <>
-            {/* رسالة الترحيب */}
+            {/* Welcome Message */}
             <div className="text-center mb-12">
               <div className="bg-white/90 backdrop-blur-md rounded-2xl p-8 shadow-2xl border" style={{ borderColor: '#87512f50' }}>
                 <h2 className="text-3xl font-bold mb-4" dir="rtl" style={{ color: '#87512f' }}>
@@ -253,161 +247,39 @@ function App() {
               </div>
             </div>
 
-            {/* الأزرار الرئيسية */}
-            <div className="text-center mb-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                {/* زر العروض الخاصة */}
-                <button
-                  onClick={() => handleSectionChange('special-offers')}
-                  className="bg-gradient-to-r from-red-500 to-red-600 text-white py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold text-lg"
-                  dir="rtl"
-                >
-                  <span className="text-2xl">🎁</span>
-                  <span>العروض الخاصة</span>
-                </button>
 
-                {/* زر اذهب للمنيو الآن */}
-                <button
-                  onClick={() => handleSectionChange('menu-categories')}
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold text-lg"
-                  dir="rtl"
-                >
-                  <span className="text-2xl">🍽️</span>
-                  <span>اذهب للمنيو الآن</span>
-                </button>
-
-                {/* زر تابعنا على السوشيال ميديا */}
-                <button
-                  onClick={() => setShowSocialModal(true)}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold text-lg"
-                  dir="rtl"
-                >
-                  <span className="text-2xl">📱</span>
-                  <span>تابعنا على السوشيال ميديا</span>
-                </button>
-
-                {/* زر اكتب رأيك الآن */}
-                <button
-                  onClick={() => setShowReviewModal(true)}
-                  className="bg-gradient-to-r from-green-500 to-green-600 text-white py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold text-lg"
-                  dir="rtl"
-                >
-                  <span className="text-2xl">⭐</span>
-                  <span>اكتب رأيك الآن</span>
-                </button>
+            {/* Category Buttons */}
+            {allSections.length > 0 && (
+              <div className="text-center mb-8">
+                <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border mb-6" style={{ borderColor: '#87512f50' }}>
+                  <h2 className="text-2xl font-bold mb-4" dir="rtl" style={{ color: '#87512f' }}>
+                    اختر من قائمة الطعام ({allSections.length} أقسام متاحة)
+                  </h2>
+                </div>
+                <CategoryButtons
+                  sections={allSections}
+                  activeSection={activeSection}
+                  onSectionChange={handleSectionChange}
+                />
               </div>
-            </div>
+            )}
 
             {/* Reviews Section */}
             <ReviewsSection />
           </>
-        ) : activeSection === 'menu-categories' ? (
-          <div>
-            {/* Back Button */}
-            <div className="mb-6">
-              <div className="flex gap-3">
-                {navigationHistory.length > 1 && (
-                  <button
-                    onClick={handleGoBack}
-                    className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
-                    style={{ color: '#87512f' }}
-                    dir="rtl"
-                  >
-                    <ArrowRight className="w-5 h-5" />
-                    <span>السابق</span>
-                  </button>
-                )}
-                <button
-                  onClick={handleGoHome}
-                  className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
-                  style={{ color: '#87512f' }}
-                  dir="rtl"
-                >
-                  <span>🏠</span>
-                  <span>الرئيسية</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Category Selection */}
-            <div className="text-center mb-8">
-              <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-amber-200/50">
-                <h2 className="text-3xl font-bold mb-4" dir="rtl" style={{ color: '#87512f' }}>
-                  اختر القسم المطلوب
-                </h2>
-                <p className="text-gray-600" dir="rtl">
-                  اختر من الأقسام التالية لتصفح المنيو
-                </p>
-              </div>
-            </div>
-
-            {/* Category Buttons */}
-            <CategoryButtons
-              sections={menuSections}
-              activeSection={activeSection}
-              onSectionChange={handleSectionChange}
-            />
-          </div>
-        ) : activeSection === 'special-offers' ? (
-          <div>
-            {/* Back Button */}
-            <div className="mb-6">
-              <div className="flex gap-3">
-                {navigationHistory.length > 1 && (
-                  <button
-                    onClick={handleGoBack}
-                    className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
-                    style={{ color: '#87512f' }}
-                    dir="rtl"
-                  >
-                    <ArrowRight className="w-5 h-5" />
-                    <span>السابق</span>
-                  </button>
-                )}
-                <button
-                  onClick={handleGoHome}
-                  className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
-                  style={{ color: '#87512f' }}
-                  dir="rtl"
-                >
-                  <span>🏠</span>
-                  <span>الرئيسية</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Special Offers Section */}
-            <SpecialOffers
-              offers={specialOffers}
-              onAddToCart={addToCart}
-            />
-          </div>
         ) : (
           <div>
             {/* Back Button */}
             <div className="mb-6">
-              <div className="flex gap-3">
-                {navigationHistory.length > 1 && (
-                  <button
-                    onClick={handleGoBack}
-                    className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
-                    style={{ color: '#87512f' }}
-                    dir="rtl"
-                  >
-                    <ArrowRight className="w-5 h-5" />
-                    <span>السابق</span>
-                  </button>
-                )}
-                <button
-                  onClick={handleGoHome}
-                  className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
-                  style={{ color: '#87512f' }}
-                  dir="rtl"
-                >
-                  <span>🏠</span>
-                  <span>الرئيسية</span>
-                </button>
-              </div>
+              <button
+                onClick={() => handleSectionChange('home')}
+                className="flex items-center gap-2 transition-colors bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg"
+                style={{ color: '#87512f' }}
+                dir="rtl"
+              >
+                <ArrowRight className="w-5 h-5" />
+                <span>العودة للرئيسية</span>
+              </button>
             </div>
 
             {/* Current Section */}
@@ -431,12 +303,12 @@ function App() {
                     لم يتم العثور على هذا القسم في المنيو. الأقسام المتاحة: {allSections.length}
                   </p>
                   <button
-                    onClick={handleGoHome}
+                    onClick={() => handleSectionChange('home')}
                     className="text-white px-6 py-2 rounded-lg transition-colors"
                     style={{ backgroundColor: '#87512f' }}
                     dir="rtl"
                   >
-                    الرئيسية
+                    العودة للرئيسية
                   </button>
                 </div>
                 <div className="mt-4 text-xs text-gray-500" dir="rtl">
@@ -452,20 +324,19 @@ function App() {
         )}
       </main>
 
-      {/* إضافة المتغيرات المطلوبة */}
-      {/* Review Modal */}
-      <ReviewModal
-        isOpen={showReviewModal}
-        onClose={() => setShowReviewModal(false)}
-      />
-
-      {/* Social Media Modal */}
-      <SocialMediaModal
-        isOpen={showSocialModal}
-        onClose={() => setShowSocialModal(false)}
-      />
-
       <Footer />
+
+      {/* Menu Actions - الأزرار الجديدة */}
+      {activeSection === 'home' && (
+        <MenuActions
+          onGoToMenu={() => {
+            // الانتقال لأول قسم متاح
+            if (allSections.length > 0) {
+              handleSectionChange(allSections[0].id);
+            }
+          }}
+        />
+      )}
 
       {/* Cart */}
       <div className="relative z-50">

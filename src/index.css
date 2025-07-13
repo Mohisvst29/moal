@@ -154,35 +154,17 @@ body {
   box-sizing: border-box;
 }
 
-/* تحسين الأداء */
-.menu-grid {
-  contain: layout style;
-}
-
-.category-grid {
-  contain: layout style;
-}
-
-/* تحسين الانتقالات */
-.transition-transform {
-  will-change: transform;
-}
-
 img {
   max-width: 100%;
   height: auto;
   display: block;
-  /* تحسين تحميل الصور */
-  content-visibility: auto;
 }
 
-/* تحسين الرسوم المتحركة */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+/* تحسين الانتقالات */
+.transition-all {
+  transition-property: transform, opacity, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
 }
 
 /* تحسين الشبكة */

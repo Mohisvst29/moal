@@ -5,44 +5,39 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // إنشاء عميل Supabase مع معالجة الأخطاء
-export let supabase: any = null;
-export let isSupabaseAvailable = false;
+let supabase: any = null;
 
 try {
   if (supabaseUrl && supabaseAnonKey && 
       supabaseUrl !== 'your_supabase_url_here' && 
       supabaseAnonKey !== 'your_supabase_anon_key_here') {
     supabase = createClient(supabaseUrl, supabaseAnonKey);
-    isSupabaseAvailable = true;
     console.log('✅ Supabase client created successfully');
   } else {
     console.warn('⚠️ Supabase environment variables not configured properly');
     console.log('Using fallback mode');
-    isSupabaseAvailable = false;
   }
 } catch (error) {
   console.warn('❌ Failed to create Supabase client:', error);
-  isSupabaseAvailable = false;
 }
 
 // إنشاء كائن وهمي للتعامل مع الأخطاء إذا لم يكن Supabase متاحاً
 if (!supabase) {
-  isSupabaseAvailable = false;
   supabase = {
     from: (table: string) => ({
-      select: (columns?: string) => Promise.resolve({
+      select: (columns?: string) => Promise.resolve({ 
         data: [], 
         error: new Error(`Supabase not configured - attempted to select from ${table}`) 
       }),
-      insert: (data: any) => Promise.resolve({
+      insert: (data: any) => Promise.resolve({ 
         data: [], 
         error: new Error(`Supabase not configured - attempted to insert into ${table}`) 
       }),
-      update: (data: any) => Promise.resolve({
+      update: (data: any) => Promise.resolve({ 
         data: [], 
         error: new Error(`Supabase not configured - attempted to update ${table}`) 
       }),
-      delete: () => Promise.resolve({
+      delete: () => Promise.resolve({ 
         data: [], 
         error: new Error(`Supabase not configured - attempted to delete from ${table}`) 
       }),
@@ -54,6 +49,7 @@ if (!supabase) {
   };
 }
 
+export { supabase };
 
 // Types for database tables
 export interface MenuSection {
@@ -99,16 +95,6 @@ export interface SpecialOffer {
   valid_until: string;
   image?: string;
   active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Review {
-  id: string;
-  customer_name: string;
-  rating: number;
-  comment: string;
-  approved: boolean;
   created_at: string;
   updated_at: string;
 }

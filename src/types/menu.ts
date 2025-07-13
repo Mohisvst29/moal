@@ -42,7 +42,6 @@ export interface SpecialOffer {
   calories?: number;
   created_at?: string;
   updated_at?: string;
-}
 
 export interface Review {
   id: string;
@@ -52,4 +51,5 @@ export interface Review {
   approved: boolean;
   created_at: string;
   updated_at: string;
+}
 }

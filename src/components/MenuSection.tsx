@@ -1,4 +1,4 @@
-import React, { useState, memo, useMemo, useEffect } from 'react';
+import React, { useState, memo, useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { MenuItem } from '../types/menu';
 
@@ -11,19 +11,6 @@ interface MenuSectionProps {
 
 const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAddToCart }) => {
   const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
-  
-  // تحسين الأداء بحفظ العناصر المفلترة
-  const availableItems = useMemo(() => {
-    return items?.filter(item => item.available !== false) || [];
-  }, [items]);
-
-  // تحسين الأداء بتأخير تحميل الصور
-  const [imagesLoaded, setImagesLoaded] = useState(false);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => setImagesLoaded(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   console.log('MenuSection received:', { 
     title, 
@@ -53,8 +40,7 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
       </div>
     );
   }
-
-  const handleSizeChange = (itemId: string | number, size: string) => {
+  const handleSizeChange = (itemId: number, size: string) => {
     const id = itemId.toString();
     setSelectedSizes(prev => ({ ...prev, [id]: size }));
   };
@@ -72,6 +58,11 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
     }
   };
 
+  // تحسين الأداء بحفظ العناصر المفلترة
+  const availableItems = useMemo(() => {
+    return items.filter(item => item.available !== false);
+  }, [items]);
+
   return (
     <div className="mb-8">
       <div className="flex items-center justify-center gap-3 mb-6">
@@ -84,19 +75,16 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
         {availableItems.map((item) => (
           <div 
             key={item.id}
-            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-transform duration-150 overflow-hidden"
+            className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden menu-item-hover"
             style={{ borderColor: '#87512f30' }}
           >
             {/* صورة المنتج */}
-            {item.image && imagesLoaded && (
+            {item.image && (
               <div className="relative">
                 <img 
                   src={item.image} 
                   alt={item.name}
                   className="w-full h-48 object-cover"
-                  loading="lazy"
-                  decoding="async"
-                  style={{ willChange: 'transform' }}
                 />
                 <div className="absolute top-2 right-2 flex gap-1">
                   {item.popular && (
@@ -136,7 +124,7 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
                   <label className="block text-sm font-medium text-gray-700 mb-2">الحجم:</label>
                   <select
                     value={selectedSizes[item.id.toString()] || item.sizes[0].size}
-                    onChange={(e) => handleSizeChange(item.id, e.target.value)}
+                    onChange={(e) => handleSizeChange(item.id.toString(), e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
                     style={{ '--tw-ring-color': '#87512f' } as React.CSSProperties}
                   >
@@ -171,7 +159,7 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
                 </div>
                 <button
                   onClick={() => handleAddToCart(item)}
-                  className="text-white px-4 py-2 rounded-lg transition-transform duration-150 font-medium flex items-center gap-2 shadow-md hover:scale-105"
+                  className="text-white px-4 py-2 rounded-lg transition-all duration-300 font-medium flex items-center gap-2 shadow-md hover:shadow-lg"
                   style={{ 
                     background: `linear-gradient(to right, #d4a574, #c49660)`,
                     ':hover': { background: `linear-gradient(to right, #c49660, #b8864c)` }
@@ -187,10 +175,6 @@ const MenuSection: React.FC<MenuSectionProps> = memo(({ title, items, icon, onAd
       </div>
     </div>
   );
-}, (prevProps, nextProps) => {
-  // تحسين إعادة الرسم
-  return prevProps.items.length === nextProps.items.length && 
-         prevProps.title === nextProps.title;
 });
 
 MenuSection.displayName = 'MenuSection';

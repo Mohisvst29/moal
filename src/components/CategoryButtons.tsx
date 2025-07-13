@@ -14,38 +14,44 @@ const CategoryButtons: React.FC<CategoryButtonsProps> = memo(({ sections, active
   });
   
   if (!sections || sections.length === 0) {
-    return null; // إخفاء الرسالة لتسريع التحميل
+    return (
+      <div className="text-center py-8">
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-amber-200/50">
+          <p className="text-amber-800 font-medium" dir="rtl">
+            لا توجد أقسام متاحة حالياً - جاري التحميل...
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="category-grid grid gap-3 mb-8" style={{ willChange: 'transform' }}>
+    <div className="category-grid grid gap-3 mb-8">
       {sections.map((section) => (
         <button
           key={section.id}
-          onClick={() => onSectionChange(section.id.toString())}
-          className={`p-4 rounded-xl border-2 transition-transform duration-150 ${
-            activeSection === section.id.toString()
+          onClick={() => onSectionChange(section.id)}
+          className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+            activeSection === section.id
               ? 'text-white shadow-lg'
-              : 'bg-white/90 backdrop-blur-sm text-gray-700 hover:shadow-lg hover:scale-105'
+              : 'bg-white/90 backdrop-blur-md text-gray-700 hover:shadow-lg hover:scale-105 hover:bg-white/95'
           }`}
-          style={activeSection === section.id.toString()
+          style={activeSection === section.id 
             ? { background: `linear-gradient(to right, #d4a574, #c49660)`, borderColor: '#d4a574' }
             : { borderColor: '#d4a57450' }
           }
-          aria-label={`قسم ${section.title}`}
         >
           <div className="text-2xl mb-2">{section.icon}</div>
           <div className="text-sm font-bold" dir="rtl">
             {section.title}
+            <div className="text-xs text-gray-500 mt-1">
+              ({section.items?.length || 0} عنصر)
+            </div>
           </div>
         </button>
       ))}
     </div>
   );
-}, (prevProps, nextProps) => {
-  // تحسين إعادة الرسم
-  return prevProps.sections.length === nextProps.sections.length && 
-         prevProps.activeSection === nextProps.activeSection;
 });
 
 CategoryButtons.displayName = 'CategoryButtons';
