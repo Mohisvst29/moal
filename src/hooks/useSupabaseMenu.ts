@@ -280,6 +280,12 @@ export const useSupabaseMenu = () => {
       }));
   }, [specialOffers, isSupabaseConnected]);
 
+  // دمج العروض الخاصة مع أقسام المنيو
+  const allSections = useMemo(() => {
+    // إرجاع أقسام المنيو فقط بدون العروض الخاصة
+    return [...menuSections];
+  }, [menuSections, specialOffers]);
+
   useEffect(() => {
     // تجنب إعادة التحميل إذا كانت البيانات محملة بالفعل
     if (dataLoaded) return;
