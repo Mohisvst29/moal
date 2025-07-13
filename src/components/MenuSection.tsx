@@ -1,4 +1,4 @@
-import React, { useState, memo, useMemo } from 'react';
+import React, { useState, memo, useMemo, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { MenuItem } from '../types/menu';
 
